@@ -1,0 +1,5 @@
+module LibStamp {
+    header "stamp.h"
+    link "stamp"
+    export *
+}
