@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct SignIn: View {
-        @State var username: String = ""
+        @State var walletName: String = ""
         @State var password: String = ""
         @Environment(\.openWindow) private var openWindow
         @State private var isActive = false
@@ -20,7 +20,7 @@ struct SignIn: View {
                                 LogoImgView()
                                 HStack {
                                         Image(systemName: "person").foregroundColor(.secondary)
-                                        TextField("Username", text: $username)
+                                        TextField("Username", text: $walletName)
                                                 .padding()
                                                 .cornerRadius(1.0)
                                 }
