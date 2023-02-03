@@ -13,12 +13,13 @@ enum CmdType:Int8{
         case nop = 0
 }
 
-typealias SDKCallback = (Void)->Void
+typealias SDKCallback = ()->Void
 class SdkDelegate{
         public static let inst = SdkDelegate()
         public static var currErr:Error?
-       
+        
         let workQueue = DispatchQueue(label: "stamp sdk delegate",qos: .background)
+        public  var Wallets:[Wallet]=[]
         
 #if DEBUG
         public  var logLevel:String = "debug"
@@ -45,14 +46,14 @@ class SdkDelegate{
                 return  NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "init lib failed with no error message"])
         }
         
-         var systemCallBack:UserInterfaceAPI = {v in
+        var systemCallBack:UserInterfaceAPI = {v in
                 guard let data = v else{
                         return  "".CStr()
                 }
                 return callback(withJson: String(cString: data)).CStr()
         }
         
-         var uiLog:SetLastErr = {v in
+        var uiLog:SetLastErr = {v in
                 guard let data = v else{
                         currErr = nil
                         return
@@ -62,7 +63,7 @@ class SdkDelegate{
                 currErr = NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: msg])
         }
         
-      
+        
         
         static func callback(withJson:String)->String{
                 
@@ -77,19 +78,38 @@ class SdkDelegate{
                 }
         }
 }
+
 extension SdkDelegate{
-        public func loadSavedWallet() ->[String]{
-               
-                return []
+        
+        public func loadSavedWallet() ->[Wallet]{
+                
+                Wallets.removeAll()
+                guard let data = LibStamp.AllWallets() else{
+                        return Wallets
+                }
+                
+                let jsonStr = String(cString: data)
+                let json = JSON(parseJSON: jsonStr)
+                
+                for (_,subJson):(String, JSON) in json {
+                        let addr = subJson["Addr"].string ?? ""
+                        let name = subJson["Name"].string ?? ""
+                        let str = subJson["JsonStr"].string
+                        let w = Wallet(Addr:addr, Name: name, jsonStr: str)
+                        Wallets.append(w)
+                }
+                
+                return Wallets
         }
         
         public func createWallet(name:String, password:String) async->Error?{
+               
                 let wData = await Task {
                         LibStamp.CreateWallet(password.GoStr(), name.GoStr())
                 }.value
                 
                 if let d = wData {
-                       let wStr = String(cString: d)
+                        let wStr = String(cString: d)
                         print("------>>>create wallet success:", wStr)
                         return nil
                 }

@@ -13,6 +13,10 @@ struct SignIn: View {
         @State var password: String = ""
         @Environment(\.openWindow) private var openWindow
         @State private var isActive = false
+        
+        @State private var wallets:[Wallet]=[Wallet]()
+        @State private var selection = Wallet()
+        
         var body: some View {
                 NavigationStack{
                         VStack {
@@ -20,9 +24,20 @@ struct SignIn: View {
                                 LogoImgView()
                                 HStack {
                                         Image(systemName: "person").foregroundColor(.secondary)
-                                        TextField("Username", text: $walletName)
-                                                .padding()
-                                                .cornerRadius(1.0)
+                                        Picker("", selection: $selection) {
+                                                ForEach(wallets, id:\.self) { wallet in
+                                                        Text(wallet.Name)
+                                                                .font(.headline)
+                                                                .fontWeight(.semibold)
+                                                        Text(wallet.Addr)
+                                                                .font(.subheadline)
+                                                                .fontWeight(.thin)
+                                                                .padding()
+                                                                .padding(.leading,100)
+                                                        
+                                                }
+                                        }
+                                        .pickerStyle(.menu)
                                 }
                                 HStack {
                                         Image(systemName: "key").foregroundColor(.secondary)
@@ -57,6 +72,11 @@ struct SignIn: View {
                                                 )
                                 }.buttonStyle(.plain)
                         } .padding()
+                }.task {
+                        wallets = SdkDelegate.inst.loadSavedWallet()
+                        selection = wallets[0]
+                }.onChange(of: selection) { newValue in
+                        password = ""
                 }
         }
         
@@ -72,7 +92,7 @@ struct SignIn: View {
 #if DEBUG
 struct SignInOrUp_Previews: PreviewProvider {
         static var previews: some View {
-                SignIn()
+                WelcomeText()
         }
 }
 #endif
@@ -95,15 +115,5 @@ struct LogoImgView : View {
                         .clipped()
                         .cornerRadius(20)
                         .padding(.bottom, 25)
-        }
-}
-
-
-struct SignUpButtonContent : View {
-        var body: some View {
-                return Text("Create Wallet")
-                        .padding()
-                        .frame(width: 220, height: 40)
-                        .cornerRadius(15.0)
         }
 }
