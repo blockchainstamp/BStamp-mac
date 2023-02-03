@@ -15,18 +15,17 @@ struct BStampApp: App {
         var body: some Scene {
                 
                 WindowGroup {
-                        SignIn().fixedSize()
+                        SignIn().fixedSize().frame(minWidth: 360,minHeight: 600)
                                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 }.windowResizability(.contentSize)
-
-                WindowGroup("main-window", id: "main") {
-                        ContentView().environment(\.managedObjectContext, persistenceController.container.viewContext)
-                }
         }
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
         func applicationDidFinishLaunching(_ notification: Notification) {
                 _ = SdkDelegate.inst.loadSavedWallet()
+        }
+        func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+                return true
         }
 }

@@ -15,16 +15,25 @@ struct NewAccount: View {
     var body: some View {
             VStack {
                     LogoImgView()
-                    TextField("wallet name", text: $walletName)
-                            .padding()
-                            .cornerRadius(1.0)
-                    SecureField("Password first", text: $password_1)
-                            .padding()
-                            .cornerRadius(1.0)
-                    SecureField("Password again", text: $password_2)
-                            .padding()
-                            .cornerRadius(1.0)
-            }
+                    HStack {
+                            Image(systemName: "person").foregroundColor(.secondary)
+                            TextField("Username", text: $walletName)
+                                    .padding()
+                                    .cornerRadius(1.0)
+                    }
+                    HStack {
+                            Image(systemName: "key").foregroundColor(.secondary)
+                            SecureField("Password", text: $password_1)
+                                    .padding()
+                                    .cornerRadius(1.0)
+                    }
+                    HStack {
+                            Image(systemName: "key").foregroundColor(.secondary)
+                            SecureField("Password", text: $password_2)
+                                    .padding()
+                                    .cornerRadius(1.0)
+                    }
+            }.frame(minWidth: 360,minHeight: 600)
     }
 }
 
