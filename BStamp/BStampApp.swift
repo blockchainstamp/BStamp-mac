@@ -23,7 +23,9 @@ struct BStampApp: App {
 
 class AppDelegate: NSObject, NSApplicationDelegate {
         func applicationDidFinishLaunching(_ notification: Notification) {
-                _ = SdkDelegate.inst.loadSavedWallet()
+                if let err = SdkDelegate.inst.InitLib(){
+                        exit(Int32((err as NSError).code))
+                }
         }
         func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
                 return true

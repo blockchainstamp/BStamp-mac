@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		694F67EF298CE24900868874 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694F67EE298CE24900868874 /* Utils.swift */; };
+		694F67F1298D09C200868874 /* SwiftyJSON.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 694F67F0298D09C200868874 /* SwiftyJSON.xcframework */; };
+		694F67F2298D09C200868874 /* SwiftyJSON.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 694F67F0298D09C200868874 /* SwiftyJSON.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6998BD3F29878B2E00C419C2 /* BStampApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6998BD3E29878B2E00C419C2 /* BStampApp.swift */; };
 		6998BD4129878B2E00C419C2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6998BD4029878B2E00C419C2 /* ContentView.swift */; };
 		6998BD4329878B3000C419C2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6998BD4229878B3000C419C2 /* Assets.xcassets */; };
@@ -21,8 +23,23 @@
 		69ED17A4298A84C800FB7998 /* stamp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ED17A3298A849E00FB7998 /* stamp.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		694F67F3298D09C200868874 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				694F67F2298D09C200868874 /* SwiftyJSON.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		694F67EE298CE24900868874 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		694F67F0298D09C200868874 /* SwiftyJSON.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwiftyJSON.xcframework; path = BStamp/Carthage/Build/SwiftyJSON.xcframework; sourceTree = "<group>"; };
 		6998BD3B29878B2E00C419C2 /* StampWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StampWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6998BD3E29878B2E00C419C2 /* BStampApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BStampApp.swift; sourceTree = "<group>"; };
 		6998BD4029878B2E00C419C2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -45,6 +62,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				69ED17A4298A84C800FB7998 /* stamp.a in Frameworks */,
+				694F67F1298D09C200868874 /* SwiftyJSON.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +117,7 @@
 		69ED17A2298A849E00FB7998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				694F67F0298D09C200868874 /* SwiftyJSON.xcframework */,
 				69ED17A3298A849E00FB7998 /* stamp.a */,
 			);
 			name = Frameworks;
@@ -114,6 +133,7 @@
 				6998BD3729878B2E00C419C2 /* Sources */,
 				6998BD3829878B2E00C419C2 /* Frameworks */,
 				6998BD3929878B2E00C419C2 /* Resources */,
+				694F67F3298D09C200868874 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

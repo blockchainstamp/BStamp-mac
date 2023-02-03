@@ -15,10 +15,12 @@ struct NewAccount: View {
         @State var title:String = ""
         @State var msg:String = ""
         @State var showTipsView: Bool = false
+        @Environment(\.presentationMode) var presentationMode
+        @State var alertAction: Alert.Button = .default(Text("Got it!"))
         
         var body: some View {
                 ZStack{
-                       
+                        
                         VStack {
                                 
                                 LogoImgView()
@@ -31,7 +33,7 @@ struct NewAccount: View {
                                         Alert(
                                                 title: Text(title),
                                                 message: Text(msg),
-                                                dismissButton: .default(Text("Got it!"))
+                                                dismissButton: alertAction
                                         )
                                 }.padding(.leading, 20).padding(.trailing,20)
                                 HStack {
@@ -61,9 +63,9 @@ struct NewAccount: View {
                                                                 .stroke(.blue, lineWidth: 2)
                                                 )
                                 }.buttonStyle(.plain)
-                        }
+                        }.disabled(showTipsView)
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
-//                        CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg, color: .blue)
+                        //                        CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg, color: .blue)
                 }.frame(minWidth: 360,minHeight: 600)
                 
         }
@@ -89,6 +91,26 @@ struct NewAccount: View {
                 }
                 showTipsView = true
                 msg = "Creating"
+                Task{
+                        let err = await SdkDelegate.inst.createWallet(name:walletName,
+                                                                      password:password_1)
+                        
+                        if let e = err{
+                                showAlert = true
+                                title = "Error"
+                                msg = e.localizedDescription
+                                return
+                        }
+                        sleep(5)
+                        showTipsView = false
+                        showAlert = true
+                        title = "Success"
+                        msg = "Wallet created!"
+                        alertAction = .default(Text("Sure")){
+                                presentationMode.wrappedValue.dismiss()
+                        }
+                        
+                }
         }
 }
 

@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import LibStamp
+
+
 struct CircularWaiting:View{
         @Binding var isPresent: Bool
         @Binding var tipsTxt: String
@@ -112,4 +115,15 @@ struct Progress_Previews: PreviewProvider {
                    .accentColor(.gray)
                    .foregroundColor(.blue)
     }
+}
+extension String {
+        
+        func GoStr() ->GoString {
+                let cs = (self as NSString).utf8String
+                let buffer = UnsafePointer<Int8>(cs!)
+                return GoString(p:buffer, n:strlen(buffer))
+        }
+        func CStr()->UnsafeMutablePointer<CChar>{
+                return UnsafeMutablePointer(mutating: (self as NSString).utf8String!)
+        }
 }
