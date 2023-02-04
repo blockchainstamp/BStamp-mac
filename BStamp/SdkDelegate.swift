@@ -8,12 +8,12 @@
 import Foundation
 import LibStamp
 import SwiftyJSON
+import SwiftUI
 
 enum CmdType:Int8{
         case nop = 0
 }
 
-typealias SDKCallback = ()->Void
 class SdkDelegate{
         public static let inst = SdkDelegate()
         public static var currErr:Error?
@@ -27,6 +27,10 @@ class SdkDelegate{
         public  var logLevel:String = 0
 #endif
         private init(){
+                NotificationCenter.default.addObserver(forName: Consts.Noti_Wallet_Created,
+                                                       object: nil,
+                                                       queue: nil,
+                                                       using: self.walletListChanged)
         }
         
         public func InitLib() -> Error?{
@@ -81,11 +85,15 @@ class SdkDelegate{
 
 extension SdkDelegate{
         
-        public func loadSavedWallet() ->[Wallet]{
-                
+        
+        func walletListChanged(_ notification: Notification) {
+                loadSavedWallet()
+        }
+        
+        public func loadSavedWallet(){
                 Wallets.removeAll()
                 guard let data = LibStamp.AllWallets() else{
-                        return Wallets
+                        return
                 }
                 
                 let jsonStr = String(cString: data)
@@ -98,12 +106,11 @@ extension SdkDelegate{
                         let w = Wallet(Addr:addr, Name: name, jsonStr: str)
                         Wallets.append(w)
                 }
-                
-                return Wallets
+                print("------>>> new wallet count:", self.Wallets.count)
         }
         
         public func createWallet(name:String, password:String) async->Error?{
-               
+                
                 let wData = await Task {
                         LibStamp.CreateWallet(password.GoStr(), name.GoStr())
                 }.value

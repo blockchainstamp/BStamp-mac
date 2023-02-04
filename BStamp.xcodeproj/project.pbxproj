@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B77E7C3298E0C760011CB0D /* consts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B77E7C2298E0C760011CB0D /* consts.swift */; };
 		694F67EF298CE24900868874 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694F67EE298CE24900868874 /* Utils.swift */; };
 		694F67F1298D09C200868874 /* SwiftyJSON.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 694F67F0298D09C200868874 /* SwiftyJSON.xcframework */; };
 		694F67F2298D09C200868874 /* SwiftyJSON.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 694F67F0298D09C200868874 /* SwiftyJSON.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -39,6 +40,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2B77E7C2298E0C760011CB0D /* consts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = consts.swift; sourceTree = "<group>"; };
 		694F67EE298CE24900868874 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		694F67F0298D09C200868874 /* SwiftyJSON.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwiftyJSON.xcframework; path = BStamp/Carthage/Build/SwiftyJSON.xcframework; sourceTree = "<group>"; };
 		694F67F4298D224900868874 /* Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wallet.swift; sourceTree = "<group>"; };
@@ -71,6 +73,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2B77E7C1298E07940011CB0D /* views */ = {
+			isa = PBXGroup;
+			children = (
+				6998BD4029878B2E00C419C2 /* ContentView.swift */,
+				69E81AFA298BB2B3006AE8CF /* NewAccount.swift */,
+				69ED179B298A7C6E00FB7998 /* SignIn.swift */,
+			);
+			path = views;
+			sourceTree = "<group>";
+		};
 		694F67F6298D225200868874 /* objs */ = {
 			isa = PBXGroup;
 			children = (
@@ -99,13 +111,11 @@
 		6998BD3D29878B2E00C419C2 /* BStamp */ = {
 			isa = PBXGroup;
 			children = (
+				2B77E7C1298E07940011CB0D /* views */,
 				694F67F6298D225200868874 /* objs */,
 				69ED179F298A825500FB7998 /* module.modulemap */,
 				69ED17A0298A844700FB7998 /* Cartfile */,
 				6998BD3E29878B2E00C419C2 /* BStampApp.swift */,
-				6998BD4029878B2E00C419C2 /* ContentView.swift */,
-				69E81AFA298BB2B3006AE8CF /* NewAccount.swift */,
-				69ED179B298A7C6E00FB7998 /* SignIn.swift */,
 				6998BD4229878B3000C419C2 /* Assets.xcassets */,
 				6998BD4729878B3000C419C2 /* Persistence.swift */,
 				6998BD4C29878B3000C419C2 /* BStamp.entitlements */,
@@ -121,6 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				6998BD4529878B3000C419C2 /* Preview Assets.xcassets */,
+				2B77E7C2298E0C760011CB0D /* consts.swift */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -213,6 +224,7 @@
 				69E81AFB298BB2B3006AE8CF /* NewAccount.swift in Sources */,
 				6998BD4B29878B3000C419C2 /* BStamp.xcdatamodeld in Sources */,
 				694F67F5298D224900868874 /* Wallet.swift in Sources */,
+				2B77E7C3298E0C760011CB0D /* consts.swift in Sources */,
 				694F67EF298CE24900868874 /* Utils.swift in Sources */,
 				6998BD3F29878B2E00C419C2 /* BStampApp.swift in Sources */,
 			);

@@ -101,15 +101,15 @@ struct NewAccount: View {
                                 msg = e.localizedDescription
                                 return
                         }
-                        sleep(5)
+                        sleep(3)
                         showTipsView = false
                         showAlert = true
                         title = "Success"
                         msg = "Wallet created!"
                         alertAction = .default(Text("Sure")){
                                 presentationMode.wrappedValue.dismiss()
+                                NotificationCenter.default.post(name: Consts.Noti_Wallet_Created, object: nil)
                         }
-                        
                 }
         }
 }

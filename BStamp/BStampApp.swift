@@ -11,7 +11,6 @@ import SwiftUI
 struct BStampApp: App {
         let persistenceController = PersistenceController.shared
         @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-        
         var body: some Scene {
                 
                 WindowGroup {

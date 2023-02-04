@@ -14,7 +14,7 @@ struct SignIn: View {
         @Environment(\.openWindow) private var openWindow
         @State private var isActive = false
         
-        @State private var wallets:[Wallet]=[Wallet]()
+        @State var wallets:[Wallet] = []
         @State private var selection = Wallet()
         
         var body: some View {
@@ -73,8 +73,12 @@ struct SignIn: View {
                                 }.buttonStyle(.plain)
                         } .padding()
                 }.task {
-                        wallets = SdkDelegate.inst.loadSavedWallet()
-                        selection = wallets[0]
+                        SdkDelegate.inst.loadSavedWallet()
+                        wallets = SdkDelegate.inst.Wallets
+                        print("======>>>", wallets.count)
+                        if wallets.count > 0{
+                                selection = wallets[0]
+                        }
                 }.onChange(of: selection) { newValue in
                         password = ""
                 }
