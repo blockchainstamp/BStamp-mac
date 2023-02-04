@@ -73,17 +73,29 @@ struct SignIn: View {
                                 }.buttonStyle(.plain)
                         } .padding()
                 }.task {
+                        refreshWallets()
+                }.onChange(of: selection) { newValue in
+                        password = ""
+                }.onAppear(){
+                        NotificationCenter.default.addObserver(forName: Consts.Noti_Wallet_Created,
+                                                               object: nil,
+                                                               queue: nil,
+                                                               using: self.walletListChanged)
+                }
+        }
+        func refreshWallets(){
+                DispatchQueue.main.async {
                         SdkDelegate.inst.loadSavedWallet()
                         wallets = SdkDelegate.inst.Wallets
                         print("======>>>", wallets.count)
                         if wallets.count > 0{
                                 selection = wallets[0]
                         }
-                }.onChange(of: selection) { newValue in
-                        password = ""
                 }
         }
-        
+        func walletListChanged(_ notification: Notification) {
+                refreshWallets()
+        }
         func openNewAccountWindow(){
                 NSApplication.shared.keyWindow?.close()
                 let window = NSWindow(contentRect: NSRect(x: 20, y: 20, width: 320, height: 600), styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView], backing: .buffered, defer: false)

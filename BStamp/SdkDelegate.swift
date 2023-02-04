@@ -27,10 +27,6 @@ class SdkDelegate{
         public  var logLevel:String = 0
 #endif
         private init(){
-                NotificationCenter.default.addObserver(forName: Consts.Noti_Wallet_Created,
-                                                       object: nil,
-                                                       queue: nil,
-                                                       using: self.walletListChanged)
         }
         
         public func InitLib() -> Error?{
@@ -86,9 +82,7 @@ class SdkDelegate{
 extension SdkDelegate{
         
         
-        func walletListChanged(_ notification: Notification) {
-                loadSavedWallet()
-        }
+        
         
         public func loadSavedWallet(){
                 Wallets.removeAll()
