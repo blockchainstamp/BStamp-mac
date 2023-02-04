@@ -46,8 +46,7 @@ struct SignIn: View {
                                                 .cornerRadius(1.0)
                                 }
                                 Button(action: {
-                                        print("Button tapped")
-                                        
+                                        signinSystem()
                                 }) {
                                         Text("Sign In").fontWeight(.bold)
                                                 .font(.system(size: 18))
@@ -103,6 +102,10 @@ struct SignIn: View {
                 window.setFrameAutosaveName("Account Window")
                 window.contentView = NSHostingView(rootView: NewAccount())
                 window.makeKeyAndOrderFront(nil)
+        }
+        
+        func signinSystem(){
+//                addr = 
         }
 }
 #if DEBUG
