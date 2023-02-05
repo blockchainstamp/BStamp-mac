@@ -65,7 +65,6 @@ struct NewAccount: View {
                                 }.buttonStyle(.plain)
                         }.disabled(showTipsView)
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
-                        //                        CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg, color: .blue)
                 }.frame(minWidth: 360,minHeight: 600)
                 
         }

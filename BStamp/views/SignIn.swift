@@ -13,7 +13,6 @@ struct SignIn: View {
 
         @FetchRequest private var addrConfs: FetchedResults<CoreData_SysConf>
         
-//        @State private var currentAddr:String?
         @State var walletName: String = ""
         @State var password: String = ""
         @Environment(\.openWindow) private var openWindow
@@ -89,13 +88,26 @@ struct SignIn: View {
                                         Text("Create Wallet").fontWeight(.bold)
                                                 .font(.system(size: 18))
                                                 .frame(width: 220, height: 20)
-                                                .foregroundColor(.red)
+                                                .foregroundColor(.orange)
                                                 .padding()
                                                 .overlay(
                                                         RoundedRectangle(cornerRadius: 16)
                                                                 .stroke(.orange, lineWidth: 2)
                                                 )
                                 }.buttonStyle(.plain)
+                                
+                                NavigationLink(destination: ImportAccount()) {
+                                        Text("Import Wallet").fontWeight(.bold)
+                                                .font(.system(size: 18))
+                                                .frame(width: 220, height: 20)
+                                                .foregroundColor(.purple)
+                                                .padding()
+                                                .overlay(
+                                                        RoundedRectangle(cornerRadius: 16)
+                                                                .stroke(.purple, lineWidth: 2)
+                                                )
+                                }.buttonStyle(.plain)
+                                
                         } .padding()
                 }.task {
                         refreshWallets()

@@ -83,9 +83,6 @@ class SdkDelegate{
 
 extension SdkDelegate{
         
-        
-        
-        
         public func loadSavedWallet(){
                 Wallets.removeAll()
                 guard let data = LibStamp.AllWallets() else{
@@ -132,6 +129,19 @@ extension SdkDelegate{
                         return e
                 }
                 
-                return  NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "  with no error message"])
+                return  NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "open wallet failed  with no error message"])
+        }
+        
+        public func importWallet(wallet:String, password:String)->Error?{
+                if let wData =  LibStamp.ImportWallet(wallet.GoStr(), password.GoStr()) {
+                        print("------>>> stamp lib import wallet success:\n", String(cString: wData))
+                        return nil
+                }
+                if let e = SdkDelegate.currErr{
+                        return e
+                }
+                
+                return  NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "import wallet failed  with no error message"])
+                
         }
 }
