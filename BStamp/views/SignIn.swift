@@ -148,23 +148,13 @@ struct SignIn: View {
                 refreshWallets()
         }
         
-        
-        func openNewAccountWindow(){
-                NSApplication.shared.keyWindow?.close()
-                let window = NSWindow(contentRect: NSRect(x: 20, y: 20, width: 800, height: 600), styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView], backing: .buffered, defer: false)
-                window.center()
-                window.setFrameAutosaveName("Account Window")
-                window.contentView = NSHostingView(rootView: ContentView().environment(\.managedObjectContext, managedObjectContext))
-                window.makeKeyAndOrderFront(nil)
-        }
-        
         func signinSystem(){
                 if let err = SdkDelegate.inst.openWallet(addr: selection.Addr, password: password){
                         showAlert = true
                         msg = err.localizedDescription
                         return
                 }
-                openNewAccountWindow()
+                NSApplication.shared.keyWindow?.contentView = NSHostingView(rootView: ContentView().environment(\.managedObjectContext, managedObjectContext).frame(minWidth: 800, minHeight: 600))
         }
 }
 #if DEBUG
