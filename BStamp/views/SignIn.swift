@@ -9,13 +9,33 @@ import SwiftUI
 
 
 struct SignIn: View {
+        @Environment(\.managedObjectContext) var managedObjectContext
+
+        @FetchRequest private var addrConfs: FetchedResults<CoreData_SysConf>
+        
+//        @State private var currentAddr:String?
         @State var walletName: String = ""
         @State var password: String = ""
         @Environment(\.openWindow) private var openWindow
         @State private var isActive = false
+        @State var showAlert:Bool = false
+        @State var title:String = ""
+        @State var msg:String = ""
         
         @State var wallets:[Wallet] = []
         @State private var selection = Wallet()
+        
+        init(){
+                let request: NSFetchRequest<CoreData_SysConf> = CoreData_SysConf.fetchRequest()
+//                request.predicate = NSPredicate(format: "active = true")
+
+                   request.sortDescriptors = [
+                       NSSortDescriptor(keyPath: \CoreData_SysConf.accountLastUsed, ascending: true)
+                   ]
+                request.fetchLimit = 1
+
+                _addrConfs = FetchRequest(fetchRequest: request)
+        }
         
         var body: some View {
                 NavigationStack{
@@ -44,6 +64,12 @@ struct SignIn: View {
                                         SecureField("Password", text: $password)
                                                 .padding()
                                                 .cornerRadius(1.0)
+                                }.alert(isPresented: $showAlert) {
+                                        Alert(
+                                                title: Text("Error"),
+                                                message: Text(msg),
+                                                dismissButton: .default(Text("Got it!"))
+                                        )
                                 }
                                 Button(action: {
                                         signinSystem()
@@ -75,37 +101,70 @@ struct SignIn: View {
                         refreshWallets()
                 }.onChange(of: selection) { newValue in
                         password = ""
+                        _addrConfs.wrappedValue.first?.accountLastUsed = newValue.Addr
                 }.onAppear(){
                         NotificationCenter.default.addObserver(forName: Consts.Noti_Wallet_Created,
                                                                object: nil,
                                                                queue: nil,
                                                                using: self.walletListChanged)
+                }.onDisappear(){
+                        try? managedObjectContext.save()
                 }
         }
         func refreshWallets(){
                 DispatchQueue.main.async {
                         SdkDelegate.inst.loadSavedWallet()
                         wallets = SdkDelegate.inst.Wallets
-                        print("======>>>", wallets.count)
-                        if wallets.count > 0{
-                                selection = wallets[0]
+                        if wallets.count == 0{
+                                return
                         }
+                        print("======>>>", wallets.count)
+                        var conf = _addrConfs.wrappedValue.first
+                        
+                        if conf == nil{
+                                conf = CoreData_SysConf(context: managedObjectContext)
+                        }
+                        
+                        guard let addr = conf?.accountLastUsed else{
+                                selection = wallets[0]
+                                conf!.accountLastUsed = selection.Addr
+                                try? managedObjectContext.save()
+                                return
+                        }
+                        for w in wallets{
+                                if addr == w.Addr{
+                                        selection = w
+                                        return
+                                }
+                        }
+                        
+                        selection = wallets[0]
+                        conf!.accountLastUsed = selection.Addr
+                        try? managedObjectContext.save()
                 }
         }
+        
         func walletListChanged(_ notification: Notification) {
                 refreshWallets()
         }
+        
+        
         func openNewAccountWindow(){
                 NSApplication.shared.keyWindow?.close()
-                let window = NSWindow(contentRect: NSRect(x: 20, y: 20, width: 320, height: 600), styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView], backing: .buffered, defer: false)
+                let window = NSWindow(contentRect: NSRect(x: 20, y: 20, width: 800, height: 600), styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView], backing: .buffered, defer: false)
                 window.center()
                 window.setFrameAutosaveName("Account Window")
-                window.contentView = NSHostingView(rootView: NewAccount())
+                window.contentView = NSHostingView(rootView: ContentView().environment(\.managedObjectContext, managedObjectContext))
                 window.makeKeyAndOrderFront(nil)
         }
         
         func signinSystem(){
-//                addr = 
+                if let err = SdkDelegate.inst.openWallet(addr: selection.Addr, password: password){
+                        showAlert = true
+                        msg = err.localizedDescription
+                        return
+                }
+                openNewAccountWindow()
         }
 }
 #if DEBUG

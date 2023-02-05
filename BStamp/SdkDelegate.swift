@@ -20,6 +20,7 @@ class SdkDelegate{
         
         let workQueue = DispatchQueue(label: "stamp sdk delegate",qos: .background)
         public  var Wallets:[Wallet]=[]
+        public var lastWalletAddr:String = ""
         
 #if DEBUG
         public  var logLevel:String = "debug"
@@ -27,6 +28,7 @@ class SdkDelegate{
         public  var logLevel:String = 0
 #endif
         private init(){
+
         }
         
         public func InitLib() -> Error?{
@@ -116,5 +118,20 @@ extension SdkDelegate{
                 }
                 
                 return SdkDelegate.currErr
+        }
+        
+        public func openWallet(addr:String, password:String)->Error?{
+                let success = LibStamp.OpenWallet(addr.GoStr(), password.GoStr()) == 1
+                
+                if success {
+                        print("------>>> stamp lib open wallet success")
+                        return nil
+                }
+                
+                if let e = SdkDelegate.currErr{
+                        return e
+                }
+                
+                return  NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "  with no error message"])
         }
 }
