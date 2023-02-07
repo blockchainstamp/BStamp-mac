@@ -54,8 +54,8 @@ class Stamp:Hashable{
                 }
                 
                 let request: NSFetchRequest<CoreData_Stamp> = CoreData_Stamp.fetchRequest()
-                let predicate = NSPredicate(format: "%address == %a",  self.Addr)
                 request.fetchLimit = 1
+                request.predicate =  NSPredicate(format: "%address == %a",  self.Addr)
                
                 var newStamp:CoreData_Stamp?
                 do {
@@ -73,7 +73,7 @@ class Stamp:Hashable{
                         
                         try ctx.save()
                 } catch let error as NSError {
-                        print("Fetch error: \(error) description: \(error.userInfo)")
+                        print("Fetch error: \(error) description: \(error.localizedDescription)")
                 }
         }
 }

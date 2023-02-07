@@ -21,6 +21,7 @@ class SdkDelegate{
         let workQueue = DispatchQueue(label: "stamp sdk delegate",qos: .background)
         public  var Wallets:[Wallet]=[]
         public var Stamps:[Stamp] = []
+        public var Settings:[Setting] = []
         public var lastWalletAddr:String = ""
         
 #if DEBUG
@@ -171,6 +172,9 @@ extension SdkDelegate{
         }
         
         public func stampConfFromBlockChain(sAddr:String)->Stamp?{
+                guard !sAddr.isEmpty else{
+                        return nil
+                }
                 guard let data = LibStamp.StampConfig(sAddr.GoStr()) else{
                         return nil
                 }

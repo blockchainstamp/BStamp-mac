@@ -22,6 +22,8 @@
 		6998BD4629878B3000C419C2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6998BD4529878B3000C419C2 /* Preview Assets.xcassets */; };
 		6998BD4829878B3000C419C2 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6998BD4729878B3000C419C2 /* Persistence.swift */; };
 		6998BD4B29878B3000C419C2 /* BStamp.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6998BD4929878B3000C419C2 /* BStamp.xcdatamodeld */; };
+		69BFC5A02991FF4600FC285F /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BFC59F2991FF4600FC285F /* Setting.swift */; };
+		69BFC5A2299243C000FC285F /* NewSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BFC5A1299243C000FC285F /* NewSettingView.swift */; };
 		69E81AFB298BB2B3006AE8CF /* NewAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E81AFA298BB2B3006AE8CF /* NewAccount.swift */; };
 		69ED179C298A7C6E00FB7998 /* SignIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69ED179B298A7C6E00FB7998 /* SignIn.swift */; };
 		69ED179E298A80B900FB7998 /* SdkDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69ED179D298A80B900FB7998 /* SdkDelegate.swift */; };
@@ -60,6 +62,8 @@
 		6998BD4729878B3000C419C2 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		6998BD4A29878B3000C419C2 /* BStamp.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BStamp.xcdatamodel; sourceTree = "<group>"; };
 		6998BD4C29878B3000C419C2 /* BStamp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BStamp.entitlements; sourceTree = "<group>"; };
+		69BFC59F2991FF4600FC285F /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
+		69BFC5A1299243C000FC285F /* NewSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSettingView.swift; sourceTree = "<group>"; };
 		69E81AFA298BB2B3006AE8CF /* NewAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAccount.swift; sourceTree = "<group>"; };
 		69ED179B298A7C6E00FB7998 /* SignIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignIn.swift; sourceTree = "<group>"; };
 		69ED179D298A80B900FB7998 /* SdkDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SdkDelegate.swift; sourceTree = "<group>"; };
@@ -86,6 +90,7 @@
 			children = (
 				6998BD4029878B2E00C419C2 /* ContentView.swift */,
 				696D888D298FB5A6007B5A59 /* MainScene.swift */,
+				69BFC5A1299243C000FC285F /* NewSettingView.swift */,
 				69E81AFA298BB2B3006AE8CF /* NewAccount.swift */,
 				696D888B298F900A007B5A59 /* ImportAccount.swift */,
 				69ED179B298A7C6E00FB7998 /* SignIn.swift */,
@@ -98,6 +103,7 @@
 			children = (
 				694F67F4298D224900868874 /* Wallet.swift */,
 				696D888F298FBB7A007B5A59 /* Stamp.swift */,
+				69BFC59F2991FF4600FC285F /* Setting.swift */,
 				696D8891298FBC12007B5A59 /* MailAccount.swift */,
 			);
 			path = objs;
@@ -231,9 +237,11 @@
 			files = (
 				6998BD4829878B3000C419C2 /* Persistence.swift in Sources */,
 				6998BD4129878B2E00C419C2 /* ContentView.swift in Sources */,
+				69BFC5A2299243C000FC285F /* NewSettingView.swift in Sources */,
 				69ED179C298A7C6E00FB7998 /* SignIn.swift in Sources */,
 				69ED179E298A80B900FB7998 /* SdkDelegate.swift in Sources */,
 				696D888C298F900A007B5A59 /* ImportAccount.swift in Sources */,
+				69BFC5A02991FF4600FC285F /* Setting.swift in Sources */,
 				69E81AFB298BB2B3006AE8CF /* NewAccount.swift in Sources */,
 				6998BD4B29878B3000C419C2 /* BStamp.xcdatamodeld in Sources */,
 				694F67F5298D224900868874 /* Wallet.swift in Sources */,

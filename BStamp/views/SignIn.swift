@@ -106,7 +106,6 @@ struct SignIn: View {
                                                                 .stroke(.purple, lineWidth: 2)
                                                 )
                                 }.buttonStyle(.plain)
-                                
                         } .padding()
                 }.task {
                         refreshWallets()
@@ -165,7 +164,7 @@ struct SignIn: View {
                         msg = err.localizedDescription
                         return
                 }
-                NSApplication.shared.keyWindow?.contentView = NSHostingView(rootView: ContentView().environment(\.managedObjectContext, managedObjectContext).frame(minWidth: 800, minHeight: 600))
+                NSApplication.shared.keyWindow?.contentView = NSHostingView(rootView: MainScene().environment(\.managedObjectContext, managedObjectContext).frame(minWidth: 800, minHeight: 600))
         }
 }
 #if DEBUG
