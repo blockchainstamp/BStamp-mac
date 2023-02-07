@@ -34,17 +34,7 @@ struct Sidebar: View {
         
         @State var selection = ""
         @State var mails:[MailAccout] = []
-        
-//        init(){
-//                let request: NSFetchRequest<CoreData_Stamp> = CoreData_Stamp.fetchRequest()
-////                request.predicate = NSPredicate(format: "wallet = ss")
-//
-//                   request.sortDescriptors = [
-//                       NSSortDescriptor(keyPath: \CoreData_Stamp.address, ascending: true)
-//                   ]
-//
-//                _stamps = FetchRequest(fetchRequest: request)
-//        }
+
         var body: some View {
                 List(selection: $selection) {
                         DisclosureGroup() {

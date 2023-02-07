@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SignIn: View {
         @Environment(\.managedObjectContext) var managedObjectContext
-
+        
         @FetchRequest private var addrConfs: FetchedResults<CoreData_SysConf>
         
         @State var walletName: String = ""
@@ -26,13 +26,12 @@ struct SignIn: View {
         
         init(){
                 let request: NSFetchRequest<CoreData_SysConf> = CoreData_SysConf.fetchRequest()
-//                request.predicate = NSPredicate(format: "active = true")
-
-                   request.sortDescriptors = [
-                       NSSortDescriptor(keyPath: \CoreData_SysConf.accountLastUsed, ascending: true)
-                   ]
+                
+                request.sortDescriptors = [
+                        NSSortDescriptor(keyPath: \CoreData_SysConf.accountLastUsed, ascending: true)
+                ]
                 request.fetchLimit = 1
-
+                
                 _addrConfs = FetchRequest(fetchRequest: request)
         }
         

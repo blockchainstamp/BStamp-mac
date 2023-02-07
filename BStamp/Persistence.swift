@@ -36,6 +36,7 @@ struct PersistenceController {
     }()
 
     let container: NSPersistentContainer
+        static  var viewContext =  shared.container.viewContext
 
     init(inMemory: Bool = false) {
         container = NSPersistentContainer(name: "BStamp")

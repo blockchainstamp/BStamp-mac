@@ -20,6 +20,7 @@ class SdkDelegate{
         
         let workQueue = DispatchQueue(label: "stamp sdk delegate",qos: .background)
         public  var Wallets:[Wallet]=[]
+        public var Stamps:[Stamp] = []
         public var lastWalletAddr:String = ""
         
 #if DEBUG
@@ -28,7 +29,7 @@ class SdkDelegate{
         public  var logLevel:String = 0
 #endif
         private init(){
-
+                
         }
         
         public func InitLib() -> Error?{
@@ -99,7 +100,7 @@ extension SdkDelegate{
                         let w = Wallet(Addr:addr, Name: name, jsonStr: str)
                         Wallets.append(w)
                 }
-                print("------>>> new wallet count:", self.Wallets.count)
+                print("------>>>wallet count:", self.Wallets.count)
         }
         
         public func createWallet(name:String, password:String) async->Error?{
@@ -142,6 +143,40 @@ extension SdkDelegate{
                 }
                 
                 return  NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "import wallet failed  with no error message"])
+        }
+}
+extension SdkDelegate{
+        
+        public func loadSavedStamp(){
+                do {
+                        Stamps.removeAll()
+                        let ctx = PersistenceController.viewContext
+                        
+                        let request: NSFetchRequest<CoreData_Stamp> = CoreData_Stamp.fetchRequest()
+                        
+                        let results = try ctx.fetch(request)
+                        if results.isEmpty{
+                                return
+                        }
+                        
+                        for obj in results{
+                                let s = Stamp(obj:obj)
+                                Stamps.append(s)
+                        }
+                        print("------>>>stamp count:", self.Stamps.count)
+                }catch let err{
+                        print("------>>> load stamp data from database:", err.localizedDescription)
+                }
                 
+        }
+        
+        public func stampConfFromBlockChain(sAddr:String)->Stamp?{
+                guard let data = LibStamp.StampConfig(sAddr.GoStr()) else{
+                        return nil
+                }
+                
+                let stamp = Stamp(json:JSON(data))
+                stamp.syncToDatabase()
+                return stamp
         }
 }

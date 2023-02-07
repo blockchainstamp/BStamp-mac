@@ -6,28 +6,74 @@
 //
 
 import Foundation
+import SwiftyJSON
+import CoreData
+
 class Stamp:Hashable{
         
         static func == (lhs: Stamp, rhs: Stamp) -> Bool {
-                return lhs.Addr == rhs.Addr && lhs.Name == rhs.Name && lhs.jsonStr == rhs.jsonStr
+                return lhs.Addr == rhs.Addr && lhs.MailBox == rhs.MailBox && lhs.IsConsumable == rhs.IsConsumable
         }
         
         var Addr:String
-        var Name:String
-        var jsonStr:String?
+        var MailBox:String
+        var IsConsumable:Bool
         
         init(){
                 Addr = ""
-                Name = ""
+                MailBox = ""
+                IsConsumable = false
         }
-       
+        init(json:JSON){
+                self.Addr = json["Addr"].string ?? ""
+                self.MailBox = json["MailBox"].string ?? ""
+                self.IsConsumable = json["IsConsumable"].bool ?? false
+        }
+        
+        init(obj:CoreData_Stamp){
+                self.Addr = obj.address ?? ""
+                self.MailBox = obj.mailbox ?? ""
+                self.IsConsumable = obj.isConsummable
+        }
+        
         func hash(into hasher: inout Hasher) {
                 hasher.combine(Addr)
-                hasher.combine(Name)
+                hasher.combine(MailBox)
         }
-        init(Addr: String, Name: String, jsonStr: String? = nil) {
+        
+        init(Addr: String, MailBox: String, consumable: Bool = false) {
                 self.Addr = Addr
-                self.Name = Name
-                self.jsonStr = jsonStr
+                self.MailBox = MailBox
+                self.IsConsumable = consumable
+        }
+        
+        func syncToDatabase(){
+                let ctx = PersistenceController.viewContext
+                guard self.Addr.isEmpty else{
+                        return
+                }
+                
+                let request: NSFetchRequest<CoreData_Stamp> = CoreData_Stamp.fetchRequest()
+                let predicate = NSPredicate(format: "%address == %a",  self.Addr)
+                request.fetchLimit = 1
+               
+                var newStamp:CoreData_Stamp?
+                do {
+                        let results = try ctx.fetch(request)
+                        if results.isEmpty {
+                                newStamp = CoreData_Stamp(context: ctx)
+                                newStamp?.address = self.Addr
+                                newStamp?.mailbox = self.MailBox
+                                newStamp?.isConsummable = self.IsConsumable
+                        } else {
+                                newStamp = results.first
+//                                newStamp?.mailbox = self.MailBox
+//                                newStamp?.isConsummable = self.IsConsumable
+                        }
+                        
+                        try ctx.save()
+                } catch let error as NSError {
+                        print("Fetch error: \(error) description: \(error.userInfo)")
+                }
         }
 }

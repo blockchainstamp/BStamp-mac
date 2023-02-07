@@ -2,7 +2,8 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CoreData_Stamp" representedClassName="CoreData_Stamp" syncable="YES" codeGenerationType="class">
         <attribute name="address" optional="YES" attributeType="String"/>
-        <attribute name="wallet" optional="YES" attributeType="String"/>
+        <attribute name="isConsummable" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="mailbox" optional="YES" attributeType="String"/>
     </entity>
     <entity name="CoreData_SysConf" representedClassName="CoreData_SysConf" syncable="YES" codeGenerationType="class">
         <attribute name="accountLastUsed" optional="YES" attributeType="String"/>
