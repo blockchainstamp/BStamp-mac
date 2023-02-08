@@ -59,24 +59,28 @@ class Setting:Hashable{
                 
                 newSetting.caData = self.caData
                 newSetting.caName = self.caName
+                
+                print("------>>>update stamp setting success")
         }
         
+        
+        
         func syncToDatabase() -> Error?{
-                let ctx = PersistenceController.viewContext
+                let ctx = PersistenceController.shared.container.viewContext
                 guard !self.mailAcc.isEmpty else{
                         return NSError(domain: "setting", code: 110, userInfo: ["localizedDescription" : "email address is empty"])
                 }
                 
                 let request: NSFetchRequest<CoreData_Setting> = CoreData_Setting.fetchRequest()
                 request.fetchLimit = 1
-                request.predicate =  NSPredicate(format: "mailAcc == %a",  self.mailAcc)
+                request.predicate =  NSPredicate(format: "mailAcc = %@",  self.mailAcc)
                
                 var newSetting:CoreData_Setting?
                 do {
                         let results = try ctx.fetch(request)
                         if results.isEmpty {
                                 newSetting = CoreData_Setting(context: ctx)
-                                newSetting?.mailAcc = self.mailAcc
+                                newSetting!.mailAcc = self.mailAcc
                                 updateSetting(&newSetting!)
                         } else {
                                 newSetting = results.first
@@ -90,5 +94,27 @@ class Setting:Hashable{
                 }
                 
                 return nil
+        }
+}
+extension Setting{
+        static func hasObj(addr:String) -> Bool{
+                return findDBObj(addr: addr) != nil
+        }
+       static func findDBObj(addr:String)->CoreData_Setting?{
+                let ctx = PersistenceController.shared.container.viewContext
+                if addr == ""{
+                        return nil
+                }
+                
+                let request: NSFetchRequest<CoreData_Setting> = CoreData_Setting.fetchRequest()
+                request.fetchLimit = 1
+                request.predicate =  NSPredicate(format: "mailAcc = %@",  addr)
+                do{
+                        let results = try ctx.fetch(request)
+                        return results.first
+                }catch let err as NSError{
+                        print("Fetch error: \(err) description: \(err.userInfo)")
+                        return nil
+                }
         }
 }

@@ -178,14 +178,18 @@ struct NewSettingView:View{
                 Task {
                         var success = true
                         msg = "checking email address"
-                        if eMailAddr.isValidEmail{
-                                emailAddrState = .success
-                        }else{
+                        if !eMailAddr.isValidEmail{
                                 emailAddrState = .failed
                                 success = false
                         }
+                        if Setting.hasObj(addr: eMailAddr){
+                                showTipsView = false
+                                showAlert = true
+                                msg = "Dupplicated Email Account"
+                                return
+                        }
                         sleep(1)
-                        
+                        emailAddrState = .success
                         
                         msg = "checking smtp address"
                         if smtpSrv.isValidHostname || smtpSrv.isValidIpAddress{

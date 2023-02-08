@@ -48,7 +48,7 @@ class Stamp:Hashable{
         }
         
         func syncToDatabase(){
-                let ctx = PersistenceController.viewContext
+                let ctx = PersistenceController.shared.container.viewContext
                 guard self.Addr.isEmpty else{
                         return
                 }

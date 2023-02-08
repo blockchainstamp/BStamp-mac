@@ -151,7 +151,7 @@ extension SdkDelegate{
         public func loadSavedStamp(){
                 do {
                         Stamps.removeAll()
-                        let ctx = PersistenceController.viewContext
+                        let ctx = PersistenceController.shared.container.viewContext
                         
                         let request: NSFetchRequest<CoreData_Stamp> = CoreData_Stamp.fetchRequest()
                         
