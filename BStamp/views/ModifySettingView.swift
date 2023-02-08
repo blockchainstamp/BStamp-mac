@@ -13,6 +13,14 @@ struct ModifySettingView: View {
         
         @State var caFileName:String = ""
         @State var caFileUrl:URL? = nil
+        @State var caChanged:Bool = false
+        
+        @State var smtpSrvAddr:String = ""
+        @State var smtpChanged:Bool = false
+        @State var imapSrvAddr:String = ""
+        @State var imapChanged:Bool = false
+        @State var stampAddr:String = ""
+        @State var stampChanged:Bool = false
         
         @State var smtpSrvState:TripState = .start
         @State var imapSrvState:TripState = .start
@@ -38,12 +46,14 @@ struct ModifySettingView: View {
                                 
                                 HStack {
                                         Image(systemName: "tray.and.arrow.up")
-                                        TextField("SMTP Server", text: $selection.smtpSrv.toUnwrapped(defaultValue: ""))
+                                        TextField("SMTP Server", text: $smtpSrvAddr)
                                                 .padding()
                                                 .cornerRadius(1.0)
                                                 .focused($focusedField, equals: "smtp")
                                                 .onSubmit {
                                                         focusedField="imap"
+                                                }.onChange(of: smtpSrvAddr) { newValue in
+                                                        smtpChanged = newValue == $selection.smtpSrv.wrappedValue
                                                 }
                                         
                                         CheckingView(state: $smtpSrvState)
@@ -51,12 +61,14 @@ struct ModifySettingView: View {
                                 
                                 HStack {
                                         Image(systemName: "tray.and.arrow.down")
-                                        TextField("IMAP Server", text: $selection.imapSrv.toUnwrapped(defaultValue: ""))
+                                        TextField("IMAP Server", text: $imapSrvAddr)
                                                 .padding()
                                                 .cornerRadius(1.0)
                                                 .focused($focusedField, equals: "imap")
                                                 .onSubmit {
                                                         focusedField="stamp"
+                                                }.onChange(of: imapSrvAddr) { newValue in
+                                                        imapChanged = newValue == $selection.imapSrv.wrappedValue
                                                 }
                                         CheckingView(state: $imapSrvState)
                                         
@@ -64,12 +76,14 @@ struct ModifySettingView: View {
                                 
                                 HStack {
                                         Image(systemName: "bitcoinsign.square")
-                                        TextField("Stamp Address", text: $selection.stampAddr.toUnwrapped(defaultValue: ""))
+                                        TextField("Stamp Address", text: $stampAddr)
                                                 .padding()
                                                 .cornerRadius(1.0)
                                                 .focused($focusedField, equals: "stamp")
                                                 .onSubmit {
                                                         focusedField="smtp"
+                                                }.onChange(of: stampAddr) { newValue in
+                                                        stampChanged = newValue == $selection.stampAddr.wrappedValue
                                                 }
                                         CheckingView(state:$stampState)
                                 }.labelStyle(.iconOnly)
@@ -89,6 +103,7 @@ struct ModifySettingView: View {
                                                 if panel.runModal() == .OK {
                                                         caFileName = panel.url?.lastPathComponent ?? ""
                                                         caFileUrl = panel.url
+                                                        caChanged = true
                                                 }
                                                 
                                                 
@@ -134,8 +149,10 @@ struct ModifySettingView: View {
                                         )
                                 } .frame(minWidth: 480,minHeight: 600)
                                 .onAppear(){
-                                        //                                        showTipsView = true
                                         caFileName = $selection.caName.wrappedValue ?? ""
+                                        smtpSrvAddr = $selection.smtpSrv.wrappedValue ?? ""
+                                        imapSrvAddr = $selection.imapSrv.wrappedValue ?? ""
+                                        stampAddr = $selection.stampAddr.wrappedValue ?? ""
                                 }
                         
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
