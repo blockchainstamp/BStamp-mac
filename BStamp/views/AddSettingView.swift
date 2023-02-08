@@ -171,6 +171,7 @@ struct AddSettingView:View{
                 caFileState = .start
                 stampState = .start
         }
+        
         func createSetting(){
                 resetState()
                 showTipsView = true

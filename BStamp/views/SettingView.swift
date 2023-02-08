@@ -17,39 +17,42 @@ struct SettingView:View{
         private var settings: FetchedResults<CoreData_Setting>
         
         @State var selection:CoreData_Setting?
-        @State var showInfoModalView: Bool = false
+        @State var showNewItemView: Bool = false
         
         var body: some View {
-                NavigationView {
-                        List(selection: $selection) {
-                                
-                                Button(action: {
-                                        showInfoModalView = true
-                                }) {
-                                        Text("New").fontWeight(.medium)
-                                                .font(.system(size: 18))
-                                                .frame(width: 120, height: 20)
-                                                .foregroundColor(.green)
-                                                .padding()
-                                                .overlay(
-                                                        RoundedRectangle(cornerRadius: 24)
-                                                                .stroke(.green, lineWidth: 2)
-                                                )
-                                }.buttonStyle(.plain)
-                                Divider()
-                                ForEach(settings) { item in
-                                        NavigationLink {
-                                                ModifySettingView(selection:item)
-                                        } label: {
-                                                Text(item.mailAcc!)
+                
+                        NavigationView {
+                                List(selection: $selection) {
+                                        
+                                        Button(action: {
+                                                showNewItemView = true
+                                        }) {
+                                                Text("New").fontWeight(.medium)
+                                                        .font(.system(size: 18))
+                                                        .frame(width: 120, height: 20)
+                                                        .foregroundColor(.green)
+                                                        .padding()
+                                                        .overlay(
+                                                                RoundedRectangle(cornerRadius: 24)
+                                                                        .stroke(.green, lineWidth: 2)
+                                                        )
+                                        }.buttonStyle(.plain)
+                                        Divider()
+                                        
+                                        ForEach(settings) { item in
+                                                NavigationLink {
+                                                        ModifySettingView(selection:item)
+                                                                .environment(\.managedObjectContext, viewContext)
+                                                } label: {
+                                                        Text(item.mailAcc!)
+                                                }
                                         }
                                 }
-                        }
-                }.sheet(isPresented: $showInfoModalView) {
-                        AddSettingView(isPresented: $showInfoModalView).fixedSize()
-                }.task {
-                        
-                }
+                        }.sheet(isPresented: $showNewItemView) {
+                                AddSettingView(isPresented: $showNewItemView).fixedSize()
+                        }.task {
+                                
+                        } 
         }
         private func deleteItems(offsets: IndexSet) {
                 withAnimation {

@@ -44,6 +44,7 @@ class Setting:Hashable{
                 self.smtpSSLOn = smtpSSL
                 self.imapSSLOn = imapSSL
                 self.caData = caData
+                self.caName = caName
         }
         
         func updateSetting(_ newSetting  :inout CoreData_Setting){

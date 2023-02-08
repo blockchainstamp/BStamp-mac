@@ -119,15 +119,15 @@ struct Progress_Previews: PreviewProvider {
 }
 
 enum Regex {
-    static let ipAddress = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
-    static let hostname = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$"
+        static let ipAddress = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+        static let hostname = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$"
         
         static   let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
 }
 
 
 extension String {
-          
+        
         func GoStr() ->GoString {
                 let cs = (self as NSString).utf8String
                 let buffer = UnsafePointer<Int8>(cs!)
@@ -138,19 +138,19 @@ extension String {
         }
         
         var isValidIpAddress: Bool {
-               return self.matches(pattern: Regex.ipAddress)
-           }
-           
-           var isValidHostname: Bool {
-               return self.matches(pattern: Regex.hostname)
-           }
-           
-           private func matches(pattern: String) -> Bool {
-               return self.range(of: pattern,
-                                 options: .regularExpression,
-                                 range: nil,
-                                 locale: nil) != nil
-           }
+                return self.matches(pattern: Regex.ipAddress)
+        }
+        
+        var isValidHostname: Bool {
+                return self.matches(pattern: Regex.hostname)
+        }
+        
+        private func matches(pattern: String) -> Bool {
+                return self.range(of: pattern,
+                                  options: .regularExpression,
+                                  range: nil,
+                                  locale: nil) != nil
+        }
         
         var isValidEmail:Bool{
                 let emailPred = NSPredicate(format:"SELF MATCHES %@", Regex.emailRegEx)
@@ -180,7 +180,7 @@ struct CheckingView:View{
 }
 
 extension Binding {
-     func toUnwrapped<T>(defaultValue: T) -> Binding<T> where Value == Optional<T>  {
-        Binding<T>(get: { self.wrappedValue ?? defaultValue }, set: { self.wrappedValue = $0 })
-    }
+        func toUnwrapped<T>(defaultValue: T) -> Binding<T> where Value == Optional<T>  {
+                Binding<T>(get: { self.wrappedValue ?? defaultValue }, set: { self.wrappedValue = $0 })
+        }
 }

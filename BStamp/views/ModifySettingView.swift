@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ModifySettingView: View {
-        
+        @Environment(\.managedObjectContext) private var viewContext
         @ObservedObject var selection:CoreData_Setting
         
         @State var caFileName:String = ""
@@ -71,13 +71,12 @@ struct ModifySettingView: View {
                                                 .onSubmit {
                                                         focusedField="smtp"
                                                 }
-                                        
                                         CheckingView(state:$stampState)
                                 }.labelStyle(.iconOnly)
                                 
                                 HStack {
                                         Image(systemName: "shield.lefthalf.filled")
-                                        TextField("CA File", text: $selection.caName.toUnwrapped(defaultValue: ""))
+                                        TextField("CA File", text: $caFileName)
                                                 .padding()
                                                 .cornerRadius(1.0)
                                                 .disabled(true)
@@ -133,41 +132,116 @@ struct ModifySettingView: View {
                                                 message: Text(msg),
                                                 dismissButton: alertAction
                                         )
+                                } .frame(minWidth: 480,minHeight: 600)
+                                .onAppear(){
+                                        //                                        showTipsView = true
+                                        caFileName = $selection.caName.wrappedValue ?? ""
                                 }
+                        
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
-                }.frame(minWidth: 480,minHeight: 600).onAppear(){
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                focusedField = "email"
+                }
+        }
+        
+        func resetState(){
+                smtpSrvState = .start
+                imapSrvState = .start
+                caFileState = .start
+                stampState = .start
+        }
+        
+        func saveChanges(){
+                
+                resetState()
+                showTipsView = true
+                
+                Task {
+                        var success = true
+                        
+                        msg = "checking smtp address"
+                        if $selection.smtpSrv.wrappedValue!.isValidHostname
+                                || $selection.smtpSrv.wrappedValue!.isValidIpAddress{
+                                smtpSrvState = .success
+                        }else{
+                                smtpSrvState = .failed
+                                success = false
+                        }
+                        sleep(1)
+                        
+                        msg = "checking imap address"
+                        if $selection.imapSrv.wrappedValue!.isValidHostname
+                                || $selection.imapSrv.wrappedValue!.isValidIpAddress{
+                                imapSrvState = .success
+                        }else{
+                                imapSrvState = .failed
+                                success = false
+                        }
+                        sleep(1)
+                        
+                        msg = "checking stamp address"
+                        let stmpAddr = $selection.stampAddr.wrappedValue!
+                        print("------>>>stampAddr:",stmpAddr)
+                        if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stmpAddr){
+                                msg = "stamp name is \(s.MailBox) "
+                                stampState = .success
+                        }else{
+                                stampState = .failed
+                                success = false
+                        }
+                        sleep(1)
+                        
+                        var caData:Data?
+                        if $selection.smtpSSLOn.wrappedValue || $selection.imapSSLOn.wrappedValue{
+                                msg = "reading CA file"
+                                if let url  = caFileUrl, let data =  try? Data(contentsOf: url){
+                                        caFileState = .success
+                                        caData = data
+                                }else{
+                                        caFileState = .failed
+                                        success = false
+                                }
+                        }
+                        if success == false{
+                                showTipsView = false
+                                return
+                        }
+                        $selection.caData.wrappedValue = caData
+                        $selection.caName.wrappedValue = caFileName
+                        try? viewContext.save()
+                        
+                        showAlert = true
+                        msg = "Success!"
+                        showTipsView = false
+                        alertAction = .default(Text("Sure")){
+                                NotificationCenter.default.post(name: Consts.Noti_Setting_Updated, object: nil)
                         }
                 }
         }
         
-        func saveChanges(){
-                print("------>>>:", selection.smtpSSLOn)
-        }
-        
         func removeItem(){
-                
+                viewContext.delete(selection)
+                try? viewContext.save()
         }
 }
 
 struct ModifySettingView_Previews: PreviewProvider {
-//
-//        static var obj:Binding<CoreData_Setting> = {
-//                Binding(get: {
-//                        let ctx = PersistenceController.shared.container.viewContext
-//                        let obj = CoreData_Setting(context: ctx)
-//                        obj.mailAcc = "xxxx@qq.com"
-//                        obj.smtpSrv = "smtp.qq.com"
-//                        obj.imapSrv = "imap.qq.com"
-//                        obj.stampName = "qq.cert"
-//                        obj.stampAddr = "0xF9Cbfd74808f812a3B8A2337BFC426B2A10Bd74a"
-//                        return obj
-//                }, set: { _ in  })
-//        }()
+        //
+        //        static var obj:Binding<CoreData_Setting> = {
+        //                Binding(get: {
+        //                        let ctx = PersistenceController.shared.container.viewContext
+        //                        let obj = CoreData_Setting(context: ctx)
+        //                        obj.mailAcc = "xxxx@qq.com"
+        //                        obj.smtpSrv = "smtp.qq.com"
+        //                        obj.imapSrv = "imap.qq.com"
+        //                        obj.stampName = "qq.cert"
+        //                        obj.stampAddr = "0xF9Cbfd74808f812a3B8A2337BFC426B2A10Bd74a"
+        //                        return obj
+        //                }, set: { _ in  })
+        //        }()
         
         static let ctx = PersistenceController.shared.container.viewContext
         static  var obj = CoreData_Setting(context: ctx)
+        @State static var show = true
+        @State static  var msg = "testing"
         static var previews: some View {
                 ModifySettingView(selection: StampWallet.ModifySettingView_Previews.obj)
         }
