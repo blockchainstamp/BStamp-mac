@@ -254,6 +254,7 @@ struct NewSettingView:View{
                         
                         showAlert = true
                         msg = "Success!"
+                        showTipsView = false
                         alertAction = .default(Text("Sure")){
                                 isPresented = false
                                 NotificationCenter.default.post(name: Consts.Noti_New_Setting_Created, object: nil)
