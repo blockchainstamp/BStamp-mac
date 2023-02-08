@@ -153,8 +153,8 @@ struct ModifySettingView: View {
                 
                 resetState()
                 showTipsView = true
-                
-                Task {
+                Task(priority: .background) {
+                        
                         var success = true
                         
                         msg = "checking smtp address"
@@ -165,7 +165,7 @@ struct ModifySettingView: View {
                                 smtpSrvState = .failed
                                 success = false
                         }
-                        sleep(1)
+                        await taskSleep(seconds: 1)
                         
                         msg = "checking imap address"
                         if $selection.imapSrv.wrappedValue!.isValidHostname
@@ -175,7 +175,7 @@ struct ModifySettingView: View {
                                 imapSrvState = .failed
                                 success = false
                         }
-                        sleep(1)
+                        await taskSleep(seconds: 1)
                         
                         msg = "checking stamp address"
                         let stmpAddr = $selection.stampAddr.wrappedValue!
@@ -187,7 +187,7 @@ struct ModifySettingView: View {
                                 stampState = .failed
                                 success = false
                         }
-                        sleep(1)
+                        await taskSleep(seconds: 1)
                         
                         var caData:Data?
                         if $selection.smtpSSLOn.wrappedValue || $selection.imapSSLOn.wrappedValue{
@@ -204,6 +204,7 @@ struct ModifySettingView: View {
                                 showTipsView = false
                                 return
                         }
+                        
                         $selection.caData.wrappedValue = caData
                         $selection.caName.wrappedValue = caFileName
                         try? viewContext.save()

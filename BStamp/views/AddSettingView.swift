@@ -189,7 +189,7 @@ struct AddSettingView:View{
                                 msg = "Dupplicated Email Account"
                                 return
                         }
-                        sleep(1)
+                        await taskSleep(seconds: 1)
                         emailAddrState = .success
                         
                         msg = "checking smtp address"
@@ -199,7 +199,7 @@ struct AddSettingView:View{
                                 smtpSrvState = .failed
                                 success = false
                         }
-                        sleep(1)
+                        await taskSleep(seconds: 1)
                         
                         
                         msg = "checking imap address"
@@ -209,7 +209,7 @@ struct AddSettingView:View{
                                 imapSrvState = .failed
                                 success = false
                         }
-                        sleep(1)
+                        await taskSleep(seconds: 1)
                         
                         msg = "checking stamp address"
                         var stampName = ""
@@ -227,7 +227,7 @@ struct AddSettingView:View{
                                         success = false
                                 }
                         }
-                        sleep(1)
+                        await taskSleep(seconds: 1)
                         
                         var caData:Data?
                         if smtpSSLOn || imapSSLOn{
