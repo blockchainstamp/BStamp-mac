@@ -9,7 +9,7 @@ import Foundation
 import CoreData
 
 class Setting:Hashable{
-      
+        
         var mailAcc:String = ""
         var stampAddr:String = ""
         var smtpSrv:String = ""
@@ -32,7 +32,6 @@ class Setting:Hashable{
         }
         
         init(){
-                
         }
         
         
@@ -76,7 +75,7 @@ class Setting:Hashable{
                 let request: NSFetchRequest<CoreData_Setting> = CoreData_Setting.fetchRequest()
                 request.fetchLimit = 1
                 request.predicate =  NSPredicate(format: "mailAcc = %@",  self.mailAcc)
-               
+                
                 var newSetting:CoreData_Setting?
                 do {
                         let results = try ctx.fetch(request)
@@ -98,11 +97,15 @@ class Setting:Hashable{
                 return nil
         }
 }
+
+
 extension Setting{
+        
         static func hasObj(addr:String) -> Bool{
                 return findDBObj(addr: addr) != nil
         }
-       static func findDBObj(addr:String)->CoreData_Setting?{
+        
+        static func findDBObj(addr:String)->CoreData_Setting?{
                 let ctx = PersistenceController.shared.container.viewContext
                 if addr == ""{
                         return nil

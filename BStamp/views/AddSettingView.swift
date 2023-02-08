@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct SettingDetailView:View{
+struct AddSettingView:View{
         @Binding var isPresented: Bool
         @State var showAlert:Bool = false
         @State var title:String = ""
@@ -273,6 +273,6 @@ struct NewSetting_Previews: PreviewProvider {
                 get: { true}, set: { _ in }
         )
         static var previews: some View {
-                SettingDetailView(isPresented: isPresent)
+                AddSettingView(isPresented: isPresent)
         }
 }
