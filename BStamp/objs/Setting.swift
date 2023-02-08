@@ -20,6 +20,8 @@ class Setting:Hashable{
         var imapSSLOn:Bool = true
         var caData:Data?
         
+        static public var Settings:[Setting] = []
+        
         static func == (lhs: Setting, rhs: Setting) -> Bool {
                 return lhs.mailAcc == rhs.mailAcc && lhs.stampAddr == rhs.stampAddr
         }

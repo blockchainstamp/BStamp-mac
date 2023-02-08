@@ -11,6 +11,8 @@ import CoreData
 
 class Stamp:Hashable{
         
+        public static var Stamps:[Stamp] = []
+        
         static func == (lhs: Stamp, rhs: Stamp) -> Bool {
                 return lhs.Addr == rhs.Addr && lhs.MailBox == rhs.MailBox && lhs.IsConsumable == rhs.IsConsumable
         }
@@ -74,6 +76,28 @@ class Stamp:Hashable{
                         try ctx.save()
                 } catch let error as NSError {
                         print("Fetch error: \(error) description: \(error.localizedDescription)")
+                }
+        }
+        
+        static public func loadSavedStamp(){
+                do {
+                        Stamps.removeAll()
+                        let ctx = PersistenceController.shared.container.viewContext
+                        
+                        let request: NSFetchRequest<CoreData_Stamp> = CoreData_Stamp.fetchRequest()
+                        
+                        let results = try ctx.fetch(request)
+                        if results.isEmpty{
+                                return
+                        }
+                        
+                        for obj in results{
+                                let s = Stamp(obj:obj)
+                                Stamps.append(s)
+                        }
+                        print("------>>>stamp count:", self.Stamps.count)
+                }catch let err{
+                        print("------>>> load stamp data from database:", err.localizedDescription)
                 }
         }
 }

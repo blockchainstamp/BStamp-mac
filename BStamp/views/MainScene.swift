@@ -41,42 +41,6 @@ struct MainScene: View {
         }
 }
 
-struct SettingView:View{
-        @State var selection:Setting = Setting()
-        @State var settings:[Setting] = []
-        @State var showInfoModalView: Bool = false
-        var body: some View {
-                
-                VStack {
-                        
-                        Spacer()
-                        Button(action: {
-                                showInfoModalView = true
-                        }) {
-                                Text("New").fontWeight(.medium)
-                                        .font(.system(size: 18))
-                                        .frame(width: 220, height: 20)
-                                        .foregroundColor(.green)
-                                        .padding()
-                                        .overlay(
-                                                RoundedRectangle(cornerRadius: 16)
-                                                        .stroke(.green, lineWidth: 2)
-                                        )
-                        }.buttonStyle(.plain)
-                        
-                        Divider()
-                        
-                        List(selection: $selection) {
-                        }
-                }.sheet(isPresented: $showInfoModalView) {
-                        NewSettingView(isPresented: $showInfoModalView).fixedSize()
-                }
-        }
-        
-        func showNewSetingDialog(){
-                
-        }
-}
 
 struct MailLabel: View {
         var mail: MailAccout

@@ -20,8 +20,6 @@ class SdkDelegate{
         
         let workQueue = DispatchQueue(label: "stamp sdk delegate",qos: .background)
         public  var Wallets:[Wallet]=[]
-        public var Stamps:[Stamp] = []
-        public var Settings:[Setting] = []
         public var lastWalletAddr:String = ""
         
 #if DEBUG
@@ -146,30 +144,9 @@ extension SdkDelegate{
                 return  NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "import wallet failed  with no error message"])
         }
 }
+
+
 extension SdkDelegate{
-        
-        public func loadSavedStamp(){
-                do {
-                        Stamps.removeAll()
-                        let ctx = PersistenceController.shared.container.viewContext
-                        
-                        let request: NSFetchRequest<CoreData_Stamp> = CoreData_Stamp.fetchRequest()
-                        
-                        let results = try ctx.fetch(request)
-                        if results.isEmpty{
-                                return
-                        }
-                        
-                        for obj in results{
-                                let s = Stamp(obj:obj)
-                                Stamps.append(s)
-                        }
-                        print("------>>>stamp count:", self.Stamps.count)
-                }catch let err{
-                        print("------>>> load stamp data from database:", err.localizedDescription)
-                }
-                
-        }
         
         public func stampConfFromBlockChain(sAddr:String)->Stamp?{
                 guard !sAddr.isEmpty else{
