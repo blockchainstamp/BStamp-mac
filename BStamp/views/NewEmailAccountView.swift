@@ -8,7 +8,8 @@
 import SwiftUI
 
 
-struct AddSettingView:View{
+struct NewEmailAccountView:View{
+        
         @Binding var isPresented: Bool
         @State var showAlert:Bool = false
         @State var title:String = ""
@@ -84,18 +85,18 @@ struct AddSettingView:View{
                                         
                                 }.labelStyle(.iconOnly)
                                 
-                                HStack {
-                                        Image(systemName: "bitcoinsign.square")
-                                        TextField("Stamp Address", text: $stampAddr)
-                                                .padding()
-                                                .cornerRadius(1.0)
-                                                .focused($focusedField, equals: "stamp")
-                                                .onSubmit {
-                                                        focusedField="email"
-                                                }
-                                        
-                                        CheckingView(state:$stampState)
-                                }.labelStyle(.iconOnly)
+//                                HStack {
+//                                        Image(systemName: "bitcoinsign.square")
+//                                        TextField("Stamp Address", text: $stampAddr)
+//                                                .padding()
+//                                                .cornerRadius(1.0)
+//                                                .focused($focusedField, equals: "stamp")
+//                                                .onSubmit {
+//                                                        focusedField="email"
+//                                                }
+//
+//                                        CheckingView(state:$stampState)
+//                                }.labelStyle(.iconOnly)
                                 
                                 HStack {
                                         Image(systemName: "shield.lefthalf.filled")
@@ -211,23 +212,23 @@ struct AddSettingView:View{
                         }
                         await taskSleep(seconds: 1)
                         
-                        msg = "checking stamp address"
-                        var stampName = ""
-                        if stampAddr.isEmpty{
-                                stampState = .failed
-                                success = false
-                        }else{
-                                print("------>>>stampAddr:",stampAddr)
-                                if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr){
-                                        msg = "stamp name is \(s.MailBox) "
-                                        stampState = .success
-                                        stampName = s.MailBox
-                                }else{
-                                        stampState = .failed
-                                        success = false
-                                }
-                        }
-                        await taskSleep(seconds: 1)
+//                        msg = "checking stamp address"
+//                        var stampName = ""
+//                        if stampAddr.isEmpty{
+//                                stampState = .failed
+//                                success = false
+//                        }else{
+//                                print("------>>>stampAddr:",stampAddr)
+//                                if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr){
+//                                        msg = "stamp name is \(s.MailBox) "
+//                                        stampState = .success
+//                                        stampName = s.MailBox
+//                                }else{
+//                                        stampState = .failed
+//                                        success = false
+//                                }
+//                        }
+//                        await taskSleep(seconds: 1)
                         
                         var caData:Data?
                         if smtpSSLOn || imapSSLOn{
@@ -246,9 +247,8 @@ struct AddSettingView:View{
                         }
                         
                         let setting = Setting(email: eMailAddr, smtp: smtpSrv, imap: imapSrv,
-                                              stampAddr: stampAddr, stampName: stampName,
-                                              smtpSSL: smtpSSLOn, imapSSL: imapSSLOn,
-                                              caName: caFileName, caData: caData)
+                                              stampAddr: stampAddr, smtpSSL: smtpSSLOn,
+                                              imapSSL: imapSSLOn,  caName: caFileName, caData: caData)
                         
                         if let e = setting.syncToDatabase(){
                                 showTipsView = false
@@ -274,6 +274,6 @@ struct NewSetting_Previews: PreviewProvider {
                 get: { true}, set: { _ in }
         )
         static var previews: some View {
-                AddSettingView(isPresented: isPresent)
+                NewEmailAccountView(isPresented: isPresent)
         }
 }

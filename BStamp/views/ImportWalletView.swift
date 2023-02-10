@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ImportAccount: View {
+struct ImportWalletView: View {
         @State var fileName:String = "File Path Of Wallet File (json format)"
         @State var fileUrl:URL? = nil
         @State var showAlert:Bool = false
@@ -31,7 +31,6 @@ struct ImportAccount: View {
                                                 fileUrl = panel.url
                                         }
                                 }
-                                
                                 
                                 SecureField("Password Of Wallet", text: $password)
                                         .padding(.leading, 40)
@@ -120,6 +119,6 @@ struct ImportAccount: View {
 
 struct ImportAccount_Previews: PreviewProvider {
         static var previews: some View {
-                ImportAccount()
+                ImportWalletView()
         }
 }

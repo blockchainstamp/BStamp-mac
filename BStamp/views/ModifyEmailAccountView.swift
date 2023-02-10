@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ModifySettingView: View {
+struct ModifyEmailAccountView: View {
         @Environment(\.managedObjectContext) private var viewContext
         @ObservedObject var selection:CoreData_Setting
         
@@ -70,26 +70,24 @@ struct ModifySettingView: View {
                                                         focusedField="stamp"
                                                 }.onChange(of: imapSrvAddr) { newValue in
                                                         imapChanged = newValue != $selection.imapSrv.wrappedValue
-                                                        print("------>>>",imapChanged)
                                                 }
                                         CheckingView(state: $imapSrvState)
                                         
                                 }.labelStyle(.iconOnly)
                                 
-                                HStack {
-                                        Image(systemName: "bitcoinsign.square")
-                                        TextField("Stamp Address", text: $stampAddr)
-                                                .padding()
-                                                .cornerRadius(1.0)
-                                                .focused($focusedField, equals: "stamp")
-                                                .onSubmit {
-                                                        focusedField="smtp"
-                                                }.onChange(of: stampAddr) { newValue in
-                                                        stampChanged = newValue != $selection.stampAddr.wrappedValue
-                                                        print("------>>>",stampChanged)
-                                                }
-                                        CheckingView(state:$stampState)
-                                }.labelStyle(.iconOnly)
+//                                HStack {
+//                                        Image(systemName: "bitcoinsign.square")
+//                                        TextField("Stamp Address", text: $stampAddr)
+//                                                .padding()
+//                                                .cornerRadius(1.0)
+//                                                .focused($focusedField, equals: "stamp")
+//                                                .onSubmit {
+//                                                        focusedField="smtp"
+//                                                }.onChange(of: stampAddr) { newValue in
+//                                                        stampChanged = newValue != $selection.stampAddr.wrappedValue
+//                                                }
+//                                        CheckingView(state:$stampState)
+//                                }.labelStyle(.iconOnly)
                                 
                                 HStack {
                                         Image(systemName: "shield.lefthalf.filled")
@@ -273,6 +271,6 @@ struct ModifySettingView_Previews: PreviewProvider {
         @State static var show = true
         @State static  var msg = "testing"
         static var previews: some View {
-                ModifySettingView(selection: StampWallet.ModifySettingView_Previews.obj)
+                ModifyEmailAccountView(selection: StampWallet.ModifySettingView_Previews.obj)
         }
 }

@@ -83,7 +83,7 @@ struct SignIn: View {
                                                 )
                                 }.buttonStyle(.plain)
                                 
-                                NavigationLink(destination: NewAccount()) {
+                                NavigationLink(destination: NewWalletView()) {
                                         Text("Create Wallet").fontWeight(.bold)
                                                 .font(.system(size: 18))
                                                 .frame(width: 220, height: 20)
@@ -95,7 +95,7 @@ struct SignIn: View {
                                                 )
                                 }.buttonStyle(.plain)
                                 
-                                NavigationLink(destination: ImportAccount()) {
+                                NavigationLink(destination: ImportWalletView()) {
                                         Text("Import Wallet").fontWeight(.bold)
                                                 .font(.system(size: 18))
                                                 .frame(width: 220, height: 20)

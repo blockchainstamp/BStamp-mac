@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NewAccount: View {
+struct NewWalletView: View {
         @State var walletName: String = ""
         @State var password_1: String = ""
         @State var password_2: String = ""
@@ -115,6 +115,6 @@ struct NewAccount: View {
 
 struct NewAccount_Previews: PreviewProvider {
         static var previews: some View {
-                NewAccount()
+                NewWalletView()
         }
 }

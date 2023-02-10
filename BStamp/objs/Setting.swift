@@ -35,7 +35,7 @@ class Setting:Hashable{
         }
         
         
-        init(email:String, smtp:String, imap:String, stampAddr:String, stampName:String, smtpSSL:Bool = true, imapSSL:Bool = true, caName:String="",caData:Data? = nil){
+        init(email:String, smtp:String, imap:String, stampAddr:String, stampName:String = "", smtpSSL:Bool = true, imapSSL:Bool = true, caName:String="",caData:Data? = nil){
                 self.mailAcc = email
                 self.smtpSrv = smtp
                 self.imapSrv = imap
