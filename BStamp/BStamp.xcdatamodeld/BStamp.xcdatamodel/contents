@@ -13,8 +13,10 @@
     </entity>
     <entity name="CoreData_Stamp" representedClassName="CoreData_Stamp" syncable="YES" codeGenerationType="class">
         <attribute name="address" optional="YES" attributeType="String"/>
+        <attribute name="balance" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="isConsummable" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="mailbox" optional="YES" attributeType="String"/>
+        <attribute name="nonce" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <entity name="CoreData_SysConf" representedClassName="CoreData_SysConf" syncable="YES" codeGenerationType="class">
         <attribute name="accountLastUsed" optional="YES" attributeType="String"/>

@@ -7,13 +7,13 @@
 
 import Foundation
 
-class Wallet:Hashable{
+class Wallet:Hashable,ObservableObject{
         
         static func == (lhs: Wallet, rhs: Wallet) -> Bool {
                 return lhs.Addr == rhs.Addr && lhs.Name == rhs.Name && lhs.jsonStr == rhs.jsonStr
         }
         
-        var Addr:String
+        @Published var Addr:String
         var Name:String
         var jsonStr:String?
         init(){

@@ -164,7 +164,7 @@ struct SignIn: View {
                         msg = err.localizedDescription
                         return
                 }
-                NSApplication.shared.keyWindow?.contentView = NSHostingView(rootView: MainScene().environment(\.managedObjectContext, managedObjectContext).frame(minWidth: 800, minHeight: 600))
+                NSApplication.shared.keyWindow?.contentView = NSHostingView(rootView: MainScene().environment(\.managedObjectContext, managedObjectContext).frame(minWidth: 800, minHeight: 600).environmentObject(selection))
         }
 }
 #if DEBUG

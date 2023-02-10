@@ -156,8 +156,22 @@ extension SdkDelegate{
                         return nil
                 }
                 
-                let stamp = Stamp(json:JSON(data))
-                stamp.syncToDatabase()
+                let stamp = Stamp(json:JSON(data))                
                 return stamp
+        }
+        
+        public func stampBalanceOfWallet(wAddr:String, sAddr:String) -> (Int64, Int64){
+                guard !wAddr.isEmpty && !sAddr.isEmpty else{
+                        return (0, 0)
+                }
+                
+                guard let data = LibStamp.GetBalance(wAddr.GoStr(), sAddr.GoStr()) else{
+                        return (0, 0)
+                }
+                
+                let obj = JSON(data)
+                let val = obj["Value"].int64 ?? 0
+                let non = obj["Nonce"].int64 ?? 0
+                return (val, non)
         }
 }
