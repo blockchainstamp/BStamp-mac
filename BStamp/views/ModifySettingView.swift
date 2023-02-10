@@ -53,7 +53,8 @@ struct ModifySettingView: View {
                                                 .onSubmit {
                                                         focusedField="imap"
                                                 }.onChange(of: smtpSrvAddr) { newValue in
-                                                        smtpChanged = newValue == $selection.smtpSrv.wrappedValue
+                                                        smtpChanged = newValue != $selection.smtpSrv.wrappedValue
+                                                        print("------>>>",smtpChanged)
                                                 }
                                         
                                         CheckingView(state: $smtpSrvState)
@@ -68,7 +69,8 @@ struct ModifySettingView: View {
                                                 .onSubmit {
                                                         focusedField="stamp"
                                                 }.onChange(of: imapSrvAddr) { newValue in
-                                                        imapChanged = newValue == $selection.imapSrv.wrappedValue
+                                                        imapChanged = newValue != $selection.imapSrv.wrappedValue
+                                                        print("------>>>",imapChanged)
                                                 }
                                         CheckingView(state: $imapSrvState)
                                         
@@ -83,7 +85,8 @@ struct ModifySettingView: View {
                                                 .onSubmit {
                                                         focusedField="smtp"
                                                 }.onChange(of: stampAddr) { newValue in
-                                                        stampChanged = newValue == $selection.stampAddr.wrappedValue
+                                                        stampChanged = newValue != $selection.stampAddr.wrappedValue
+                                                        print("------>>>",stampChanged)
                                                 }
                                         CheckingView(state:$stampState)
                                 }.labelStyle(.iconOnly)
@@ -167,63 +170,69 @@ struct ModifySettingView: View {
         }
         
         func saveChanges(){
-                
                 resetState()
                 showTipsView = true
                 Task(priority: .background) {
                         
                         var success = true
                         
-                        msg = "checking smtp address"
-                        if $selection.smtpSrv.wrappedValue!.isValidHostname
-                                || $selection.smtpSrv.wrappedValue!.isValidIpAddress{
-                                smtpSrvState = .success
-                        }else{
-                                smtpSrvState = .failed
-                                success = false
-                        }
-                        await taskSleep(seconds: 1)
-                        
-                        msg = "checking imap address"
-                        if $selection.imapSrv.wrappedValue!.isValidHostname
-                                || $selection.imapSrv.wrappedValue!.isValidIpAddress{
-                                imapSrvState = .success
-                        }else{
-                                imapSrvState = .failed
-                                success = false
-                        }
-                        await taskSleep(seconds: 1)
-                        
-                        msg = "checking stamp address"
-                        let stmpAddr = $selection.stampAddr.wrappedValue!
-                        print("------>>>stampAddr:",stmpAddr)
-                        if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stmpAddr){
-                                msg = "stamp name is \(s.MailBox) "
-                                stampState = .success
-                        }else{
-                                stampState = .failed
-                                success = false
-                        }
-                        await taskSleep(seconds: 1)
-                        
-                        var caData:Data?
-                        if $selection.smtpSSLOn.wrappedValue || $selection.imapSSLOn.wrappedValue{
-                                msg = "reading CA file"
-                                if let url  = caFileUrl, let data =  try? Data(contentsOf: url){
-                                        caFileState = .success
-                                        caData = data
+                        if smtpChanged{
+                                msg = "checking smtp address"
+                                if smtpSrvAddr.isValidHostname || smtpSrvAddr.isValidIpAddress{
+                                        smtpSrvState = .success
                                 }else{
-                                        caFileState = .failed
+                                        smtpSrvState = .failed
                                         success = false
                                 }
+                                $selection.smtpSrv.wrappedValue = smtpSrvAddr
+                                await taskSleep(seconds: 1)
                         }
+                        
+                        if imapChanged{
+                                msg = "checking imap address"
+                                if imapSrvAddr.isValidHostname || imapSrvAddr.isValidIpAddress{
+                                        imapSrvState = .success
+                                }else{
+                                        imapSrvState = .failed
+                                        success = false
+                                }
+                                $selection.imapSrv.wrappedValue = imapSrvAddr
+                                await taskSleep(seconds: 1)
+                        }
+                        
+                        if stampChanged{
+                                msg = "checking stamp address"
+                                if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr){
+                                        msg = "stamp name is \(s.MailBox) "
+                                        stampState = .success
+                                }else{
+                                        stampState = .failed
+                                        success = false
+                                }
+                                $selection.stampAddr.wrappedValue = stampAddr
+                                await taskSleep(seconds: 1)
+                        }
+                        if caChanged{
+                                var caData:Data?
+                                if $selection.smtpSSLOn.wrappedValue || $selection.imapSSLOn.wrappedValue{
+                                        msg = "reading CA file"
+                                        if let url  = caFileUrl, let data =  try? Data(contentsOf: url){
+                                                caFileState = .success
+                                                caData = data
+                                        }else{
+                                                caFileState = .failed
+                                                success = false
+                                        }
+                                }
+                                $selection.caData.wrappedValue = caData
+                                $selection.caName.wrappedValue = caFileName
+                        }
+                        
                         if success == false{
                                 showTipsView = false
                                 return
                         }
-                        
-                        $selection.caData.wrappedValue = caData
-                        $selection.caName.wrappedValue = caFileName
+                       
                         try? viewContext.save()
                         
                         showAlert = true
@@ -232,6 +241,9 @@ struct ModifySettingView: View {
                         alertAction = .default(Text("Sure")){
                                 NotificationCenter.default.post(name: Consts.Noti_Setting_Updated, object: nil)
                         }
+                        smtpChanged = false
+                        imapChanged = false
+                        stampChanged = false
                 }
         }
         
