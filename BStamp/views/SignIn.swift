@@ -159,6 +159,13 @@ struct SignIn: View {
         }
         
         func signinSystem(){
+                
+                if selection.Addr.isEmpty{
+                        showAlert = true
+                        msg = "please create or import wallet first"
+                        return
+                }
+                
                 if let err = SdkDelegate.inst.openWallet(addr: selection.Addr, password: password){
                         showAlert = true
                         msg = err.localizedDescription
