@@ -46,12 +46,14 @@ struct NewWalletView: View {
                                         Image(systemName: "key").foregroundColor(.secondary)
                                         SecureField("Password Again", text: $password_2)
                                                 .padding()
-                                                .cornerRadius(5.0)
-                                }.padding(.bottom, 40).padding(.leading, 20).padding(.trailing,20)
+                                                .cornerRadius(5.0).onSubmit {
+                                                        createWallet()
+                                                }
+                                }.padding(.bottom, 40)
+                                        .padding(.leading, 20)
+                                        .padding(.trailing,20)
                                 Button(action: {
                                         createWallet()
-                                        
-                                        
                                 }) {
                                         Text("Create").fontWeight(.bold)
                                                 .font(.system(size: 18))

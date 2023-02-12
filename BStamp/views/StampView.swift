@@ -52,7 +52,7 @@ struct StampView: View {
         }
 }
 
-struct EmailAccountView_Previews: PreviewProvider {
+struct StampView_Previews: PreviewProvider {
         static var previews: some View {
                 StampView()
         }

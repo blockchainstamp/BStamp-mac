@@ -12,6 +12,7 @@
 		690EAA592995E017006DFB18 /* StampDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690EAA582995E017006DFB18 /* StampDetailsView.swift */; };
 		690EAA5B2995E0F3006DFB18 /* NewStampView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690EAA5A2995E0F3006DFB18 /* NewStampView.swift */; };
 		690EAA5D2995E186006DFB18 /* WalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 690EAA5C2995E186006DFB18 /* WalletView.swift */; };
+		692A112D2998B62900587B55 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 692A112C2998B62900587B55 /* SettingView.swift */; };
 		694F67EF298CE24900868874 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 694F67EE298CE24900868874 /* Utils.swift */; };
 		694F67F1298D09C200868874 /* SwiftyJSON.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 694F67F0298D09C200868874 /* SwiftyJSON.xcframework */; };
 		694F67F2298D09C200868874 /* SwiftyJSON.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 694F67F0298D09C200868874 /* SwiftyJSON.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -56,6 +57,7 @@
 		690EAA582995E017006DFB18 /* StampDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StampDetailsView.swift; sourceTree = "<group>"; };
 		690EAA5A2995E0F3006DFB18 /* NewStampView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewStampView.swift; sourceTree = "<group>"; };
 		690EAA5C2995E186006DFB18 /* WalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletView.swift; sourceTree = "<group>"; };
+		692A112C2998B62900587B55 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		694F67EE298CE24900868874 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		694F67F0298D09C200868874 /* SwiftyJSON.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = SwiftyJSON.xcframework; path = BStamp/Carthage/Build/SwiftyJSON.xcframework; sourceTree = "<group>"; };
 		694F67F4298D224900868874 /* Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wallet.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				696D888D298FB5A6007B5A59 /* MainScene.swift */,
+				692A112C2998B62900587B55 /* SettingView.swift */,
 				69BFC5A1299243C000FC285F /* NewEmailAccountView.swift */,
 				695D253A2993835D00085157 /* ModifyEmailAccountView.swift */,
 				695D25382993767300085157 /* EmailAccountView.swift */,
@@ -271,6 +274,7 @@
 				696D888E298FB5A6007B5A59 /* MainScene.swift in Sources */,
 				694F67EF298CE24900868874 /* Utils.swift in Sources */,
 				6998BD3F29878B2E00C419C2 /* BStampApp.swift in Sources */,
+				692A112D2998B62900587B55 /* SettingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

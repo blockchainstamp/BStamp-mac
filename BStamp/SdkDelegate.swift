@@ -143,6 +143,16 @@ extension SdkDelegate{
                 
                 return  NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "import wallet failed  with no error message"])
         }
+        
+        public func removeWallet(addr:String)->Error?{
+                guard LibStamp.RemoveWallet(addr.GoStr()) == 1 else{
+                        guard let e = SdkDelegate.currErr else{
+                                return NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "remove wallet failed "])
+                        }
+                        return e
+                }
+                return nil
+        }
 }
 
 

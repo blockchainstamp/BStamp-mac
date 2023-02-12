@@ -9,6 +9,7 @@ import SwiftUI
 
 struct StampDetailsView: View {
         @EnvironmentObject private var currentWallet: Wallet
+        @Environment(\.managedObjectContext) private var viewContext
         @ObservedObject var selection:CoreData_Stamp
         @State var isConsumable:Bool = false
         @State var balance:String = "0"
@@ -59,6 +60,11 @@ struct StampDetailsView: View {
                                                 .cornerRadius(1.0).disabled(true)
                                 }
                                 Spacer()
+                                Button(action: {
+                                        removeItem()
+                                }, label: {
+                                        Label("Delete", systemImage: "trash")
+                                })
                                 
                         }.padding().onAppear(){
                                 balance = "\(selection.balance)"
@@ -66,6 +72,11 @@ struct StampDetailsView: View {
                         }
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
                 }
+        }
+        
+        private func removeItem(){
+                viewContext.delete(selection)
+                try? viewContext.save()
         }
         
         func reloadFromBlockChain(){

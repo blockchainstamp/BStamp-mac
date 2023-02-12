@@ -71,7 +71,7 @@ struct EmailAccountView:View{
         }
 }
 
-struct SettingView_Previews: PreviewProvider {
+struct EmailAccountView_Previews: PreviewProvider {
         static var previews: some View {
                 EmailAccountView()
         }

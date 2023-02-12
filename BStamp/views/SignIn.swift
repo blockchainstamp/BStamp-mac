@@ -124,6 +124,7 @@ struct SignIn: View {
                         try? managedObjectContext.save()
                 }
         }
+        
         func refreshWallets(){
                 DispatchQueue.main.async {
                         SdkDelegate.inst.loadSavedWallet()

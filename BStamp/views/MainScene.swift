@@ -15,7 +15,7 @@ struct MainScene: View {
                 NavigationView {
                         List {
                                 NavigationLink {
-                                        EmailAccountView()
+                                        SettingView()
                                 } label: {
                                         Label("Settings", systemImage: "gear")
                                 }
