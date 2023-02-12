@@ -62,6 +62,9 @@ struct SignIn: View {
                                         SecureField("Password", text: $password)
                                                 .padding()
                                                 .cornerRadius(1.0)
+                                                .onSubmit {
+                                                        signinSystem()
+                                                }
                                 }.alert(isPresented: $showAlert) {
                                         Alert(
                                                 title: Text("Error"),

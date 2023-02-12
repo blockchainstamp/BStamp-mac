@@ -17,6 +17,7 @@ struct NewStampView: View {
         @State var nonce:String = "0"
         @State var showTipsView:Bool = false
         @State var showAlert:Bool = false
+        @State var curStamp:Stamp? = nil
         
         @State var title:String = ""
         @State var msg:String = ""
@@ -90,16 +91,20 @@ struct NewStampView: View {
                                 
                         }.padding()
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
-                }.frame(minWidth: 320,minHeight: 480)
+                }.frame(minWidth: 420,minHeight: 420)
         }
         
-        private func loadBasicInfo() async -> Stamp?{
-                
+        private func loadBasicInfo() async{
+                if !SdkDelegate.inst.isValidEtherAddr(sAddr: stampAddr) {
+                        msg = "need valid stamp addr!"
+                        showAlert = true
+                        return
+                }
                 
                 if Stamp.hasObj(addr: stampAddr){
                         msg = "Duplicated!"
                         showAlert = true
-                        return nil
+                        return
                 }
                 
                 showTipsView = true
@@ -108,7 +113,7 @@ struct NewStampView: View {
                         showTipsView = false
                         msg = "laod stamp from blcok chain failed"
                         showAlert = true
-                        return nil
+                        return
                 }
                 
                 
@@ -119,15 +124,22 @@ struct NewStampView: View {
                 
                 msg = "load stamp balance"
                 print("------>>>current wallet:",currentWallet.Addr)
-                let (val, non) = SdkDelegate.inst.stampBalanceOfWallet(wAddr: currentWallet.Addr,
+                let (val, non) = SdkDelegate.inst.stampBalanceOfWallet(wAddr: currentWallet.EthAddr,
                                                                        sAddr: stampAddr)
                 s.balance = val
+                balance = "\(val)"
                 s.nonce = non
+                nonce = "\(non)"
                 await taskSleep(seconds: 1)
                 showTipsView = false
-                return s
+                curStamp = s
         }
         private func validStamp(){
+                if let s = curStamp{
+                        if s.Addr == stampAddr{
+                                return
+                        }
+                }
                 Task{
                         await loadBasicInfo()
                 }
@@ -135,7 +147,10 @@ struct NewStampView: View {
         
         private func saveStamp(){
                 Task{
-                        guard let s = await loadBasicInfo() else{
+                        if curStamp == nil{
+                                await loadBasicInfo()
+                        }
+                        guard let s = curStamp else{
                                 return
                         }
                         if let err = s.syncToDatabase(){

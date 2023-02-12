@@ -58,7 +58,7 @@ class Stamp:Hashable{
         
         func syncToDatabase() -> Error?{
                 let ctx = PersistenceController.shared.container.viewContext
-                guard self.Addr.isEmpty else{
+                guard !self.Addr.isEmpty else{
                         return  NSError(domain: "stamp", code: 110, userInfo: ["localizedDescription" : "stamp address is empty"])
                 }
                 

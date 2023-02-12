@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct WalletView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
+        @EnvironmentObject var curWallet: Wallet
+        var body: some View {
+                Text(curWallet.Addr) .textSelection(.enabled)
+                Text(curWallet.Name) .textSelection(.enabled)
+                Text(curWallet.jsonStr!) .textSelection(.enabled)
+        }
 }
 
 struct WalletView_Previews: PreviewProvider {
-    static var previews: some View {
-        WalletView()
-    }
+        static var previews: some View {
+                WalletView()
+        }
 }

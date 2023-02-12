@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 class Wallet:Hashable,ObservableObject{
         
@@ -15,6 +16,7 @@ class Wallet:Hashable,ObservableObject{
         
         @Published var Addr:String
         var Name:String
+        var EthAddr:String?
         var jsonStr:String?
         init(){
                 Addr = ""
@@ -29,5 +31,9 @@ class Wallet:Hashable,ObservableObject{
                 self.Addr = Addr
                 self.Name = Name
                 self.jsonStr = jsonStr
+                if jsonStr != nil{
+                        let jObj = JSON(parseJSON: jsonStr!)
+                        self.EthAddr = jObj["eth_addr"].string
+                }
         }
 }

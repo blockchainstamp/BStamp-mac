@@ -42,7 +42,7 @@ struct StampView: View {
                                                 StampDetailsView(selection:item)
                                                         .environment(\.managedObjectContext, viewContext)
                                         } label: {
-                                                Text(item.address!)
+                                                Text(item.mailbox!)
                                         }
                                 }
                         }
