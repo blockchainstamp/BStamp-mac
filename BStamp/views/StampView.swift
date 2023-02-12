@@ -14,7 +14,7 @@ struct StampView: View {
         @FetchRequest(
                 sortDescriptors: [NSSortDescriptor(keyPath: \CoreData_Stamp.address, ascending: true)],
                 animation: .default)
-        private var settings: FetchedResults<CoreData_Stamp>
+        private var stampsInDB: FetchedResults<CoreData_Stamp>
         
         @State var selection:CoreData_Stamp?
         @State var showNewItemView: Bool = false
@@ -37,7 +37,7 @@ struct StampView: View {
                                 }.buttonStyle(.plain)
                                 Divider()
                                 
-                                ForEach(settings) { item in
+                                ForEach(stampsInDB) { item in
                                         NavigationLink {
                                                 StampDetailsView(selection:item)
                                                         .environment(\.managedObjectContext, viewContext)

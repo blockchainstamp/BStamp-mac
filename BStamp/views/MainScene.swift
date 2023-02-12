@@ -15,6 +15,11 @@ struct MainScene: View {
                 NavigationView {
                         List {
                                 NavigationLink {
+                                        ServerView()
+                                } label: {
+                                        Label("Server", systemImage: "server.rack")
+                                }
+                                NavigationLink {
                                         SettingView()
                                 } label: {
                                         Label("Settings", systemImage: "gear")

@@ -18,6 +18,8 @@ class Wallet:Hashable,ObservableObject{
         var Name:String
         var EthAddr:String?
         var jsonStr:String?
+        private var tmpPassword = ""
+        
         init(){
                 Addr = ""
                 Name = ""
@@ -35,5 +37,11 @@ class Wallet:Hashable,ObservableObject{
                         let jObj = JSON(parseJSON: jsonStr!)
                         self.EthAddr = jObj["eth_addr"].string
                 }
+        }
+        func setPassword(pwd:String){
+                self.tmpPassword = pwd
+        }
+        func getPasswrod()->String{
+                return self.tmpPassword
         }
 }

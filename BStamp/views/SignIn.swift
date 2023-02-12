@@ -175,6 +175,7 @@ struct SignIn: View {
                         msg = err.localizedDescription
                         return
                 }
+                selection.setPassword(pwd: password)
                 NSApplication.shared.keyWindow?.contentView = NSHostingView(rootView: MainScene().environment(\.managedObjectContext, managedObjectContext).frame(minWidth: 800, minHeight: 600).environmentObject(selection))
         }
 }
