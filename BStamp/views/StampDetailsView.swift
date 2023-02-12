@@ -65,6 +65,7 @@ struct StampDetailsView: View {
                                 }, label: {
                                         Label("Delete", systemImage: "trash")
                                 })
+                                Spacer()
                                 
                         }.padding().onAppear(){
                                 balance = "\(selection.balance)"
