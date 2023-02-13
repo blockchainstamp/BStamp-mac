@@ -29,4 +29,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
                 return true
         }
+        func applicationWillResignActive(_ notification: Notification) {
+                try? PersistenceController.shared.container.viewContext.save()
+        }
+        func applicationWillTerminate(_ notification: Notification) {
+                try? PersistenceController.shared.container.viewContext.save()
+        }
 }

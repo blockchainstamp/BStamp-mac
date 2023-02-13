@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ImportWalletView: View {
+        @Binding var isPresented: Bool
         @State var fileName:String = "File Path Of Wallet File (json format)"
         @State var fileUrl:URL? = nil
         @State var showAlert:Bool = false
@@ -118,7 +119,10 @@ struct ImportWalletView: View {
 }
 
 struct ImportAccount_Previews: PreviewProvider {
+        static private var isPresent = Binding<Bool> (
+                get: { true}, set: { _ in }
+        )
         static var previews: some View {
-                ImportWalletView()
+                ImportWalletView(isPresented: isPresent)
         }
 }

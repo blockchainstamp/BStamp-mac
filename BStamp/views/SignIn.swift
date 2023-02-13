@@ -18,6 +18,7 @@ struct SignIn: View {
         @Environment(\.openWindow) private var openWindow
         @State private var isActive = false
         @State var showAlert:Bool = false
+        @State var showWalletView:Bool = false
         @State var title:String = ""
         @State var msg:String = ""
         
@@ -56,6 +57,13 @@ struct SignIn: View {
                                                 }
                                         }
                                         .pickerStyle(.menu)
+                                        Button(action:{
+                                                showWalletView = true
+                                        }){
+                                                Image(systemName: "gear")
+                                        }.sheet(isPresented: $showWalletView) {
+                                                WalletManagerView(isPresented:$showAlert)
+                                        }
                                 }
                                 HStack {
                                         Image(systemName: "key").foregroundColor(.secondary)
@@ -86,29 +94,29 @@ struct SignIn: View {
                                                 )
                                 }.buttonStyle(.plain)
                                 
-                                NavigationLink(destination: NewWalletView()) {
-                                        Text("Create Wallet").fontWeight(.bold)
-                                                .font(.system(size: 18))
-                                                .frame(width: 220, height: 20)
-                                                .foregroundColor(.orange)
-                                                .padding()
-                                                .overlay(
-                                                        RoundedRectangle(cornerRadius: 16)
-                                                                .stroke(.orange, lineWidth: 2)
-                                                )
-                                }.buttonStyle(.plain)
-                                
-                                NavigationLink(destination: ImportWalletView()) {
-                                        Text("Import Wallet").fontWeight(.bold)
-                                                .font(.system(size: 18))
-                                                .frame(width: 220, height: 20)
-                                                .foregroundColor(.purple)
-                                                .padding()
-                                                .overlay(
-                                                        RoundedRectangle(cornerRadius: 16)
-                                                                .stroke(.purple, lineWidth: 2)
-                                                )
-                                }.buttonStyle(.plain)
+//                                NavigationLink(destination: NewWalletView(isPresented: $showWalletView)) {
+//                                        Text("Create Wallet").fontWeight(.bold)
+//                                                .font(.system(size: 18))
+//                                                .frame(width: 220, height: 20)
+//                                                .foregroundColor(.orange)
+//                                                .padding()
+//                                                .overlay(
+//                                                        RoundedRectangle(cornerRadius: 16)
+//                                                                .stroke(.orange, lineWidth: 2)
+//                                                )
+//                                }.buttonStyle(.plain)
+//                                
+//                                NavigationLink(destination: ImportWalletView(isPresented: $showWalletView)) {
+//                                        Text("Import Wallet").fontWeight(.bold)
+//                                                .font(.system(size: 18))
+//                                                .frame(width: 220, height: 20)
+//                                                .foregroundColor(.purple)
+//                                                .padding()
+//                                                .overlay(
+//                                                        RoundedRectangle(cornerRadius: 16)
+//                                                                .stroke(.purple, lineWidth: 2)
+//                                                )
+//                                }.buttonStyle(.plain)
                         } .padding()
                 }.task {
                         refreshWallets()
@@ -137,6 +145,9 @@ struct SignIn: View {
                         
                         if conf == nil{
                                 conf = CoreData_SysConf(context: managedObjectContext)
+                                conf?.imapPort = 996
+                                conf?.smtpPort = 443
+                                conf?.sslOn = true
                         }
                         
                         guard let addr = conf?.accountLastUsed else{
@@ -176,7 +187,13 @@ struct SignIn: View {
                         return
                 }
                 selection.setPassword(pwd: password)
-                NSApplication.shared.keyWindow?.contentView = NSHostingView(rootView: MainScene().environment(\.managedObjectContext, managedObjectContext).frame(minWidth: 800, minHeight: 600).environmentObject(selection))
+                print("------->>> first is empty?=>", _addrConfs.wrappedValue.first == nil)
+                let mainView = MainScene()
+                        .environment(\.managedObjectContext, managedObjectContext)
+                        .frame(minWidth: 900, minHeight: 800)
+                        .environmentObject(selection)
+                        .environmentObject(_addrConfs.wrappedValue.first!)
+                NSApplication.shared.keyWindow?.contentView = NSHostingView(rootView: mainView)
         }
 }
 #if DEBUG

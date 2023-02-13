@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct NewWalletView: View {
+        @Binding var isPresented: Bool
         @State var walletName: String = ""
         @State var password_1: String = ""
         @State var password_2: String = ""
@@ -116,7 +117,10 @@ struct NewWalletView: View {
 }
 
 struct NewAccount_Previews: PreviewProvider {
+        static private var isPresent = Binding<Bool> (
+                get: { true}, set: { _ in }
+        )
         static var previews: some View {
-                NewWalletView()
+                NewWalletView(isPresented: isPresent)
         }
 }

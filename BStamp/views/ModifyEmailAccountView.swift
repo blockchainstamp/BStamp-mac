@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ModifyEmailAccountView: View {
+        @Binding var isPresented: Bool
         @Environment(\.managedObjectContext) private var viewContext
         @ObservedObject var selection:CoreData_Setting
         
@@ -75,19 +76,21 @@ struct ModifyEmailAccountView: View {
                                         
                                 }.labelStyle(.iconOnly)
                                 
-//                                HStack {
-//                                        Image(systemName: "bitcoinsign.square")
-//                                        TextField("Stamp Address", text: $stampAddr)
-//                                                .padding()
-//                                                .cornerRadius(1.0)
-//                                                .focused($focusedField, equals: "stamp")
-//                                                .onSubmit {
-//                                                        focusedField="smtp"
-//                                                }.onChange(of: stampAddr) { newValue in
-//                                                        stampChanged = newValue != $selection.stampAddr.wrappedValue
-//                                                }
-//                                        CheckingView(state:$stampState)
-//                                }.labelStyle(.iconOnly)
+                                HStack {
+                                        Image(systemName: "bitcoinsign.square")
+                                        TextField("Stamp Address", text: $stampAddr)
+                                                .padding()
+                                                .cornerRadius(1.0)
+                                                .focused($focusedField, equals: "stamp")
+                                                .onSubmit {
+                                                        focusedField="smtp"
+                                                }.onChange(of: stampAddr) { newValue in
+                                                        stampChanged = newValue != $selection.stampAddr.wrappedValue
+                                                }.onSubmit {
+                                                        //TODO::
+                                                }
+                                        CheckingView(state:$stampState)
+                                }.labelStyle(.iconOnly)
                                 
                                 HStack {
                                         Image(systemName: "shield.lefthalf.filled")
@@ -133,10 +136,16 @@ struct ModifyEmailAccountView: View {
                                                 Label("Save", systemImage: "square.and.arrow.down")
                                         })
                                         Spacer()
+//                                        Button(action: {
+//                                                removeItem()
+//                                        }, label: {
+//                                                Label("Delete", systemImage: "trash")
+//                                        })
+//                                        Spacer()
                                         Button(action: {
-                                                removeItem()
+                                                isPresented = false
                                         }, label: {
-                                                Label("Delete", systemImage: "trash")
+                                                Label("Cancel", systemImage: "leaf")
                                         })
                                         Spacer()
                                 }.padding()
@@ -269,8 +278,9 @@ struct ModifySettingView_Previews: PreviewProvider {
         static let ctx = PersistenceController.shared.container.viewContext
         static  var obj = CoreData_Setting(context: ctx)
         @State static var show = true
+        @State static var showModItemView = true
         @State static  var msg = "testing"
         static var previews: some View {
-                ModifyEmailAccountView(selection: StampWallet.ModifySettingView_Previews.obj)
+                ModifyEmailAccountView(isPresented: $showModItemView, selection: StampWallet.ModifySettingView_Previews.obj)
         }
 }

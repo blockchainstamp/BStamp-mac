@@ -18,6 +18,7 @@ struct EmailAccountView:View{
         
         @State var selection:CoreData_Setting?
         @State var showNewItemView: Bool = false
+        @State var showModItemView: Bool = true
         
         var body: some View {
                 
@@ -41,7 +42,7 @@ struct EmailAccountView:View{
                                 
                                 ForEach(settings) { item in
                                         NavigationLink {
-                                                ModifyEmailAccountView(selection:item)
+                                                ModifyEmailAccountView(isPresented: $showModItemView, selection:item)
                                                         .environment(\.managedObjectContext, viewContext)
                                         } label: {
                                                 Text(item.mailAcc!)
