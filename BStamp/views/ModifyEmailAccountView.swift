@@ -207,18 +207,18 @@ struct ModifyEmailAccountView: View {
                                 await taskSleep(seconds: 1)
                         }
                         
-//                        if stampChanged{
-//                                msg = "checking stamp address"
-//                                if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr){
-//                                        msg = "stamp name is \(s.MailBox) "
-//                                        stampState = .success
-//                                }else{
-//                                        stampState = .failed
-//                                        success = false
-//                                }
-//                                $selection.stampAddr.wrappedValue = stampAddr
-//                                await taskSleep(seconds: 1)
-//                        }
+                        if stampChanged{
+                                msg = "checking stamp address"
+                                if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr){
+                                        msg = "stamp name is \(s.MailBox) "
+                                        stampState = .success
+                                }else{
+                                        stampState = .failed
+                                        success = false
+                                }
+                                $selection.stampAddr.wrappedValue = stampAddr
+                                await taskSleep(seconds: 1)
+                        }
                         if caChanged{
                                 var caData:Data?
                                 if $selection.smtpSSLOn.wrappedValue || $selection.imapSSLOn.wrappedValue{

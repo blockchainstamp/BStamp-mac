@@ -11,10 +11,10 @@ import CoreData
 class Setting:Hashable{
         
         var mailAcc:String = ""
-        var stampAddr:String = ""
+        var stampAddr:String?
         var smtpSrv:String = ""
         var imapSrv:String = ""
-        var stampName:String = ""
+        var stampName:String?
         var caName:String = ""
         var smtpSSLOn:Bool=true
         var imapSSLOn:Bool = true
@@ -35,7 +35,7 @@ class Setting:Hashable{
         }
         
         
-        init(email:String, smtp:String, imap:String, stampAddr:String, stampName:String = "", smtpSSL:Bool = true, imapSSL:Bool = true, caName:String="",caData:Data? = nil){
+        init(email:String, smtp:String, imap:String, stampAddr:String? = nil, stampName:String? = nil, smtpSSL:Bool = true, imapSSL:Bool = true, caName:String="",caData:Data? = nil){
                 self.mailAcc = email
                 self.smtpSrv = smtp
                 self.imapSrv = imap

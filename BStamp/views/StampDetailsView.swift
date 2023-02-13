@@ -91,7 +91,7 @@ struct StampDetailsView: View {
                         msg = "load stamp balance"
                         await taskSleep(seconds: 1)
                         print("------>>>current wallet:", walletAddr)
-                        let (val, non) = SdkDelegate.inst.stampBalanceOfWallet(wAddr: walletAddr,
+                        let (val, non) = await SdkDelegate.inst.stampBalanceOfWallet(wAddr: walletAddr,
                                                                                sAddr: sAddr)
                         if selection.balance != val{
                                 selection.balance = val

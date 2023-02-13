@@ -106,7 +106,6 @@ struct AccountListView: View {
                 animation: .default)
         private var settings: FetchedResults<CoreData_Setting>
         
-        @State var selection:CoreData_Setting?
         @State var showNewItemView: Bool = false
         @State var showModifyItemView = false
         @State var showDelAlert = false
@@ -116,16 +115,19 @@ struct AccountListView: View {
                                 Button {
                                         showNewItemView = true
                                 } label: {
-                                        Image(systemName: "plus")
+                                        Label("New Account", systemImage: "plus")
                                 }
+                                
                                 Spacer()
                         }.sheet(isPresented: $showNewItemView) {
                                 NewEmailAccountView(isPresented: $showNewItemView).fixedSize()
                         }
-                        List{
+                        Divider()
+                        List(){
                                 ForEach(settings) { item in
                                         HStack{
                                                 Text(item.mailAcc!)
+                                                Text(item.stampName ?? "no stamp")
                                                 Spacer()
                                                 Button {
                                                         showModifyItemView = true
@@ -158,8 +160,6 @@ struct AccountListView: View {
                                                                 )
                                                         )
                                                 }
-                                                Spacer()
-                                                Spacer()
                                         }
                                 }
                         }

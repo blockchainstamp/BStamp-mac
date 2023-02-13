@@ -10,6 +10,7 @@ import SwiftUI
 
 struct NewEmailAccountView:View{
         
+        @EnvironmentObject private var currentWallet: Wallet
         @Binding var isPresented: Bool
         @State var showAlert:Bool = false
         @State var title:String = ""
@@ -33,6 +34,8 @@ struct NewEmailAccountView:View{
         @State var alertAction: Alert.Button = .default(Text("Got it!"))
         @State var caFileUrl:URL? = nil
         
+        @State var stampObj:Stamp?
+        
         @FocusState var focusedField: String?
         
         var body: some View {
@@ -46,14 +49,14 @@ struct NewEmailAccountView:View{
                                         .fontWeight(.bold)
                                 Spacer()
                                 HStack {
-                                        Image(systemName: "house.lodge")
+                                        Image(systemName: "signpost.left.circle")
                                         TextField("Email Address", text: $eMailAddr)
                                                 .padding()
                                                 .cornerRadius(1.0)
                                                 .focused($focusedField, equals: "email")
                                                 .onSubmit {
                                                         focusedField="smtp"
-                                                }
+                                                }.border(.green)
                                         
                                         CheckingView(state: $emailAddrState)
                                 }.labelStyle(.iconOnly)
@@ -67,7 +70,7 @@ struct NewEmailAccountView:View{
                                                 .focused($focusedField, equals: "smtp")
                                                 .onSubmit {
                                                         focusedField="imap"
-                                                }
+                                                }.border(.green)
                                         
                                         CheckingView(state: $smtpSrvState)
                                 }.labelStyle(.iconOnly)
@@ -79,24 +82,11 @@ struct NewEmailAccountView:View{
                                                 .cornerRadius(1.0)
                                                 .focused($focusedField, equals: "imap")
                                                 .onSubmit {
-                                                        focusedField="stamp"
-                                                }
+                                                        focusedField="email"
+                                                }.border(.green)
                                         CheckingView(state: $imapSrvState)
                                         
                                 }.labelStyle(.iconOnly)
-                                
-//                                HStack {
-//                                        Image(systemName: "bitcoinsign.square")
-//                                        TextField("Stamp Address", text: $stampAddr)
-//                                                .padding()
-//                                                .cornerRadius(1.0)
-//                                                .focused($focusedField, equals: "stamp")
-//                                                .onSubmit {
-//                                                        focusedField="email"
-//                                                }
-//
-//                                        CheckingView(state:$stampState)
-//                                }.labelStyle(.iconOnly)
                                 
                                 HStack {
                                         Image(systemName: "shield.lefthalf.filled")
@@ -104,7 +94,7 @@ struct NewEmailAccountView:View{
                                                 .padding()
                                                 .cornerRadius(1.0)
                                                 .disabled(true)
-                                                
+                                        
                                         Button(action: {
                                                 
                                                 let panel = NSOpenPanel()
@@ -114,8 +104,6 @@ struct NewEmailAccountView:View{
                                                         caFileName = panel.url?.lastPathComponent ?? ""
                                                         caFileUrl = panel.url
                                                 }
-                                                
-                                                
                                         }, label: {
                                                 Label("File", systemImage: "folder")
                                         })
@@ -132,7 +120,64 @@ struct NewEmailAccountView:View{
                                         
                                         Spacer()
                                 }
-                                Spacer()
+                                
+                                Divider()
+                                
+                                VStack{
+                                        HStack {
+                                                Image(systemName: "bitcoinsign.square")
+                                                TextField("Stamp Address", text: $stampAddr, onEditingChanged: { editingChanged in
+                                                        if editingChanged{
+                                                                return
+                                                        }
+                                                        loadStampData()
+                                                }).border(.green)
+                                                        .padding()
+                                                        .cornerRadius(1.0).disabled(showTipsView)
+                                                        .onSubmit {
+                                                                loadStampData()
+                                                        }
+                                                
+                                                CheckingView(state:$stampState)
+                                        }.labelStyle(.iconOnly)
+                                        
+                                        HStack{
+                                                Label {
+                                                        Text("MailBox: \(stampObj?.MailBox ?? "")")
+                                                } icon: {
+                                                        Image(systemName: "envelope.open")
+                                                }
+                                                
+                                                
+                                                Spacer()
+                                                Image(systemName: "cart")
+                                                Toggle("Is Consumable", isOn: Binding(get: {
+                                                        return stampObj?.IsConsumable ?? false
+                                                }, set: { _ in }))
+                                                .toggleStyle(.checkbox).disabled(true)
+                                                Spacer()
+                                        }
+                                        
+                                        HStack{
+                                                Label {
+                                                        Text("Balance: \(stampObj?.balance ?? 0)")
+                                                } icon: {
+                                                        Image(systemName: "bitcoinsign.square")
+                                                }
+                                                
+                                                Spacer()
+                                                
+                                                Label {
+                                                        Text("Nonce: \(stampObj?.nonce ?? 0)")
+                                                } icon: {
+                                                        Image(systemName: "list.number")
+                                                }
+                                                
+                                                Spacer()
+                                        }
+                                        
+                                }.padding().border(.purple)
+                                
                                 HStack{
                                         Spacer()
                                         Button(action: {
@@ -148,6 +193,7 @@ struct NewEmailAccountView:View{
                                         })
                                         Spacer()
                                 }.padding()
+                                
                         }.padding().focusSection()
                                 .disabled(showTipsView)
                                 .alert(isPresented: $showAlert) {
@@ -158,10 +204,45 @@ struct NewEmailAccountView:View{
                                         )
                                 }
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
-                }.frame(minWidth: 480,minHeight: 600).onAppear(){
+                }.frame(minWidth: 560,minHeight: 680).onAppear(){
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 focusedField = "email"
-                            }
+                        }
+                }
+        }
+        
+        func loadStampData(){
+                guard !stampAddr.isEmpty else{
+                        stampObj = nil
+                        return
+                }
+                
+                if stampObj != nil && stampObj?.Addr == stampAddr{
+                        return
+                }
+                
+                showTipsView = true
+                Task {
+                        msg = "checking stamp address"
+                        await taskSleep(seconds: 1)
+                        
+                        guard SdkDelegate.inst.isValidEtherAddr(sAddr: stampAddr) else{
+                                showTipsView = false
+                                return
+                        }
+                        
+                        guard let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr) else{
+                                showTipsView = false
+                                return
+                        }
+                        msg = "balance of stamp"
+                        await taskSleep(seconds: 1)
+                        
+                        stampObj = s
+                        let (val, non) = await SdkDelegate.inst.stampBalanceOfWallet(wAddr: currentWallet.EthAddr, sAddr: stampAddr)
+                        stampObj?.balance = val
+                        stampObj?.nonce = non
+                        showTipsView = false
                 }
         }
         
@@ -183,6 +264,8 @@ struct NewEmailAccountView:View{
                         if !eMailAddr.isValidEmail{
                                 emailAddrState = .failed
                                 success = false
+                        }else{
+                                emailAddrState = .success
                         }
                         if Setting.hasObj(addr: eMailAddr){
                                 showTipsView = false
@@ -191,7 +274,6 @@ struct NewEmailAccountView:View{
                                 return
                         }
                         await taskSleep(seconds: 1)
-                        emailAddrState = .success
                         
                         msg = "checking smtp address"
                         if smtpSrv.isValidHostname || smtpSrv.isValidIpAddress{
@@ -212,23 +294,25 @@ struct NewEmailAccountView:View{
                         }
                         await taskSleep(seconds: 1)
                         
-//                        msg = "checking stamp address"
-//                        var stampName = ""
-//                        if stampAddr.isEmpty{
-//                                stampState = .failed
-//                                success = false
-//                        }else{
-//                                print("------>>>stampAddr:",stampAddr)
-//                                if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr){
-//                                        msg = "stamp name is \(s.MailBox) "
-//                                        stampState = .success
-//                                        stampName = s.MailBox
-//                                }else{
-//                                        stampState = .failed
-//                                        success = false
-//                                }
-//                        }
-//                        await taskSleep(seconds: 1)
+                        
+                        var stampName:String?
+                        if !stampAddr.isEmpty{
+                                if stampObj == nil || stampObj?.Addr != stampAddr{
+                                        msg = "checking stamp address"
+                                        stampObj = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr)
+                                }
+                                
+                                if let s = stampObj{
+                                        msg = "stamp name is \(s.MailBox) "
+                                        stampState = .success
+                                        stampName = s.MailBox
+                                }else{
+                                        stampState = .failed
+                                        success = false
+                                }
+                        }
+                        
+                        await taskSleep(seconds: 1)
                         
                         var caData:Data?
                         if smtpSSLOn || imapSSLOn{
@@ -247,7 +331,7 @@ struct NewEmailAccountView:View{
                         }
                         
                         let setting = Setting(email: eMailAddr, smtp: smtpSrv, imap: imapSrv,
-                                              stampAddr: stampAddr, smtpSSL: smtpSSLOn,
+                                              stampAddr: stampAddr, stampName: stampName, smtpSSL: smtpSSLOn,
                                               imapSSL: imapSSLOn,  caName: caFileName, caData: caData)
                         
                         if let e = setting.syncToDatabase(){

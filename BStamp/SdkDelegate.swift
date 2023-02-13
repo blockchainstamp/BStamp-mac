@@ -167,12 +167,13 @@ extension SdkDelegate{
                 }
                 
                 let jsonStr = String(cString: data)
-               
+                
                 let stamp = Stamp(json: JSON(parseJSON: jsonStr))                
                 return stamp
         }
         
-        public func stampBalanceOfWallet(wAddr:String?, sAddr:String) -> (Int64, Int64){
+        public func stampBalanceOfWallet(wAddr:String?, sAddr:String)async -> (Int64, Int64){
+                
                 guard let wallet = wAddr , !sAddr.isEmpty else{
                         return (0, 0)
                 }
@@ -185,9 +186,10 @@ extension SdkDelegate{
                 let val = obj["Value"].int64 ?? 0
                 let non = obj["Nonce"].int64 ?? 0
                 return (val, non)
+                
         }
         
         public func isValidEtherAddr(sAddr:String) ->Bool{
-               return LibStamp.IsValidStampAddr(sAddr.GoStr()) == 1
+                return LibStamp.IsValidStampAddr(sAddr.GoStr()) == 1
         }
 }

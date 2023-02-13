@@ -124,13 +124,13 @@ struct NewStampView: View {
                 
                 msg = "load stamp balance"
                 print("------>>>current wallet:",currentWallet.Addr)
-                let (val, non) = SdkDelegate.inst.stampBalanceOfWallet(wAddr: currentWallet.EthAddr,
+                
+                let (val, non) = await SdkDelegate.inst.stampBalanceOfWallet(wAddr: currentWallet.EthAddr,
                                                                        sAddr: stampAddr)
                 s.balance = val
                 balance = "\(val)"
                 s.nonce = non
                 nonce = "\(non)"
-                await taskSleep(seconds: 1)
                 showTipsView = false
                 curStamp = s
         }
