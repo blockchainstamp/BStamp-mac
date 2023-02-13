@@ -107,7 +107,7 @@ struct AccountListView: View {
         private var settings: FetchedResults<CoreData_Setting>
         
         @State var showNewItemView: Bool = false
-        @State var showModifyItemView = false
+        @State var showModifyItemView:[String:Bool] = [:]
         @State var showDelAlert = false
         var body: some View {
                 VStack{
@@ -130,11 +130,11 @@ struct AccountListView: View {
                                                 Text(item.stampName ?? "no stamp")
                                                 Spacer()
                                                 Button {
-                                                        showModifyItemView = true
+                                                        showModifyItemView[item.mailAcc!] = true
                                                 } label: {
                                                         Image(systemName: "square.and.pencil")
-                                                }.sheet(isPresented:$showModifyItemView) {
-                                                        ModifyEmailAccountView(isPresented:$showModifyItemView,
+                                                }.sheet(isPresented:$showModifyItemView[item.mailAcc!].toUnwrapped(defaultValue: false)) {
+                                                        ModifyEmailAccountView(isPresented:$showModifyItemView[item.mailAcc!].toUnwrapped(defaultValue: false),
                                                                                selection:item)
                                                         .environment(\.managedObjectContext, viewContext)
                                                 }

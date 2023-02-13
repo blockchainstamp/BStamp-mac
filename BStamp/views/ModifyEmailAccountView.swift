@@ -28,6 +28,8 @@ struct ModifyEmailAccountView: View {
         @State var caFileState:TripState = .start
         @State var stampState:TripState = .start
         
+        @State var stampObj:Stamp?
+        @EnvironmentObject private var currentWallet: Wallet
         
         @FocusState var focusedField: String?
         @State var showAlert:Bool = false
@@ -38,7 +40,7 @@ struct ModifyEmailAccountView: View {
                 ZStack{
                         List {
                                 HStack {
-                                        Image(systemName: "house.lodge")
+                                        Image(systemName: "signpost.left.circle")
                                         TextField("Email Address", text: $selection.mailAcc.toUnwrapped(defaultValue: ""))
                                                 .padding()
                                                 .cornerRadius(1.0)
@@ -56,7 +58,7 @@ struct ModifyEmailAccountView: View {
                                                 }.onChange(of: smtpSrvAddr) { newValue in
                                                         smtpChanged = newValue != $selection.smtpSrv.wrappedValue
                                                         print("------>>>",smtpChanged)
-                                                }
+                                                }.border(.green)
                                         
                                         CheckingView(state: $smtpSrvState)
                                 }.labelStyle(.iconOnly)
@@ -71,26 +73,11 @@ struct ModifyEmailAccountView: View {
                                                         focusedField="stamp"
                                                 }.onChange(of: imapSrvAddr) { newValue in
                                                         imapChanged = newValue != $selection.imapSrv.wrappedValue
-                                                }
+                                                }.border(.green)
                                         CheckingView(state: $imapSrvState)
                                         
                                 }.labelStyle(.iconOnly)
-                                
-                                HStack {
-                                        Image(systemName: "bitcoinsign.square")
-                                        TextField("Stamp Address", text: $stampAddr)
-                                                .padding()
-                                                .cornerRadius(1.0)
-                                                .focused($focusedField, equals: "stamp")
-                                                .onSubmit {
-                                                        focusedField="smtp"
-                                                }.onChange(of: stampAddr) { newValue in
-                                                        stampChanged = newValue != $selection.stampAddr.wrappedValue
-                                                }.onSubmit {
-                                                        //TODO::
-                                                }
-                                        CheckingView(state:$stampState)
-                                }.labelStyle(.iconOnly)
+                              
                                 
                                 HStack {
                                         Image(systemName: "shield.lefthalf.filled")
@@ -127,7 +114,69 @@ struct ModifyEmailAccountView: View {
                                         
                                         Spacer()
                                 }
-                                Spacer()
+                                Divider()
+                                
+                                VStack{
+                                        HStack {
+                                                Image(systemName: "bitcoinsign.square")
+                                                TextField("Stamp Address", text: $stampAddr, onEditingChanged: { editingChanged in
+                                                        if editingChanged{
+                                                                return
+                                                        }
+                                                        loadStampData()
+                                                }).border(.green)
+                                                        .padding()
+                                                        .cornerRadius(1.0).disabled(showTipsView)
+                                                        .onSubmit {
+                                                                loadStampData()
+                                                        }
+                                                
+                                                CheckingView(state:$stampState)
+                                                Button(action: {
+                                                        removeStamp()
+                                                }, label: {
+                                                        Label("Clear", systemImage: "x.circle")
+                                                })
+                                        }//.labelStyle(.iconOnly)
+                                        
+                                        HStack{
+                                                Label {
+                                                        Text("MailBox: \(stampObj?.MailBox ?? "")")
+                                                } icon: {
+                                                        Image(systemName: "envelope.open")
+                                                }
+                                                
+                                                
+                                                Spacer()
+                                                Image(systemName: "cart")
+                                                Toggle("Is Consumable", isOn: Binding(get: {
+                                                        return stampObj?.IsConsumable ?? false
+                                                }, set: { _ in }))
+                                                .toggleStyle(.checkbox).disabled(true)
+                                                Spacer()
+                                        }
+                                        
+                                        HStack{
+                                                Label {
+                                                        Text("Balance: \(stampObj?.balance ?? 0)")
+                                                } icon: {
+                                                        Image(systemName: "bitcoinsign.square")
+                                                }
+                                                
+                                                Spacer()
+                                                
+                                                Label {
+                                                        Text("Nonce: \(stampObj?.nonce ?? 0)")
+                                                } icon: {
+                                                        Image(systemName: "list.number")
+                                                }
+                                                
+                                                Spacer()
+                                        }
+                                        
+                                }.padding().border(.purple)
+                                
+
                                 HStack{
                                         Spacer()
                                         Button(action: {
@@ -136,12 +185,7 @@ struct ModifyEmailAccountView: View {
                                                 Label("Save", systemImage: "square.and.arrow.down")
                                         })
                                         Spacer()
-//                                        Button(action: {
-//                                                removeItem()
-//                                        }, label: {
-//                                                Label("Delete", systemImage: "trash")
-//                                        })
-//                                        Spacer()
+
                                         Button(action: {
                                                 isPresented = false
                                         }, label: {
@@ -166,6 +210,42 @@ struct ModifyEmailAccountView: View {
                                 }
                         
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
+                }
+        }
+        
+        func loadStampData(){
+                guard !stampAddr.isEmpty else{
+                        stampObj = nil
+                        return
+                }
+                
+                guard SdkDelegate.inst.isValidEtherAddr(sAddr: stampAddr) else{
+                        stampObj = nil
+                        showTipsView = false
+                        return
+                }
+                
+                if stampObj != nil && stampObj?.Addr == stampAddr{
+                        return
+                }
+                
+                showTipsView = true
+                Task {
+                        msg = "checking stamp address"
+                        await taskSleep(seconds: 1)
+                        
+                        guard let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr) else{
+                                showTipsView = false
+                                return
+                        }
+                        msg = "balance of stamp"
+                        await taskSleep(seconds: 1)
+                        
+                        stampObj = s
+                        let (val, non) = await SdkDelegate.inst.stampBalanceOfWallet(wAddr: currentWallet.EthAddr, sAddr: stampAddr)
+                        stampObj?.balance = val
+                        stampObj?.nonce = non
+                        showTipsView = false
                 }
         }
         
@@ -207,18 +287,29 @@ struct ModifyEmailAccountView: View {
                                 await taskSleep(seconds: 1)
                         }
                         
-                        if stampChanged{
+                        
+                        if stampAddr.isEmpty{
+                                removeStamp()
+                        }else{
                                 msg = "checking stamp address"
-                                if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr){
-                                        msg = "stamp name is \(s.MailBox) "
+                                if let s = stampObj{
+                                        $selection.stampAddr.wrappedValue = s.Addr
+                                        $selection.stampName.wrappedValue = s.MailBox
                                         stampState = .success
                                 }else{
-                                        stampState = .failed
-                                        success = false
+                                        if let s = SdkDelegate.inst.stampConfFromBlockChain(sAddr: stampAddr){
+                                                msg = "stamp name is \(s.MailBox) "
+                                                stampState = .success
+                                                $selection.stampAddr.wrappedValue = s.Addr
+                                                $selection.stampName.wrappedValue = s.MailBox
+                                        }else{
+                                                stampState = .failed
+                                                success = false
+                                        }
                                 }
-                                $selection.stampAddr.wrappedValue = stampAddr
-                                await taskSleep(seconds: 1)
                         }
+                        await taskSleep(seconds: 1)
+                        
                         if caChanged{
                                 var caData:Data?
                                 if $selection.smtpSSLOn.wrappedValue || $selection.imapSSLOn.wrappedValue{
@@ -254,9 +345,11 @@ struct ModifyEmailAccountView: View {
                 }
         }
         
-        func removeItem(){
-                viewContext.delete(selection)
-                try? viewContext.save()
+        func removeStamp(){
+                $selection.stampAddr.wrappedValue = nil
+                $selection.stampName.wrappedValue = nil
+                stampObj = nil
+                stampAddr = ""
         }
 }
 
