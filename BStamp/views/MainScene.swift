@@ -23,7 +23,10 @@ struct MainScene: View {
                                         AccountListView(curSrvIsOn: $curSrvIsOn)
                                         Spacer()
                                 }.padding().frame(maxHeight: 320)
-                                TextArea(text: $logText) .border(Color.purple).padding().disabled(true)
+                                TextArea(text: $logText)
+                                        .border(Color.purple)
+                                        .padding().textSelection(.enabled)
+//                                        .disabled(true)
                                 Spacer()
                         }.padding()
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
@@ -36,6 +39,9 @@ struct MainScene: View {
         
         func logOutPut(_ msg:String){
                 logText = logText + msg
+                if logText.lengthOfBytes(using: .utf8) >= Consts.MaxLogSize{
+                        logText.removeFirst(Consts.MaxLogSize >> 1 )
+                }
         }
 }
 
@@ -138,8 +144,25 @@ struct ControlView: View {
                         )
                 }
         }
-        
         private func startOrStopService(){
+                if curSrvIsOn{
+                        stop()
+                }else{
+                        start()
+                }
+        }
+        
+        private func stop(){
+                showTipsView = true
+                Task{
+                        msg = "stoping..."
+                        SdkDelegate.inst.stopService()
+                        await taskSleep(seconds: 1)
+                        showTipsView = false
+                }
+        }
+        
+        private func start(){
                 curSrvIsOn = true
                 showTipsView = true
                 Task{
@@ -152,15 +175,29 @@ struct ControlView: View {
                                 msg = "config prepare failed"
                                 return
                         }
-                        
-                        print("------>>> conf json:", str )
-                        if  let e =  SdkDelegate.inst.initService(confJson:str,auth:""){
+                        await taskSleep(seconds: 1)
+                        msg = "init service config..."
+                        if  let e =  SdkDelegate.inst.initService(confJson:str,auth:curWallet.getPasswrod()){
                                 showTipsView = false
                                 curSrvIsOn = false
                                 showAlert = true
                                 msg = e.localizedDescription
                                 return
                         }
+                        
+                        await taskSleep(seconds: 1)
+                        
+                        msg = "starting service config..."
+                        if let e = SdkDelegate.inst.startService() {
+                                showTipsView = false
+                                curSrvIsOn = false
+                                showAlert = true
+                                msg = e.localizedDescription
+                                return
+                        }
+                        
+                        await taskSleep(seconds: 1)
+                        showTipsView = false
                 }
         }
         
@@ -171,27 +208,46 @@ struct ControlView: View {
                 for obj in settings {
                         imapRemote[obj.mailAcc!] = [
                                 "ca_files":obj.caFilePath ?? "",
-                                "ca_domain":obj.smtpSrv ?? "",
-                                "allow_not_secure":obj.smtpSSLOn,
-                                "remote_srv_name":obj.smtpSrv ?? "",
-                                "remote_srv_port":systemConf.smtpPort,
+                                "ca_domain":obj.imapSrv ?? "",
+                                "allow_not_secure":!obj.imapSSLOn,
+                                "remote_srv_name":obj.imapSrv ?? "",
+                                "remote_srv_port":obj.imapPort,
                         ]
                         smtpRemote[obj.mailAcc!] = [
-                                "srv_addr":"\(systemConf.smtpPort)",
+                                "ca_files":obj.caFilePath ?? "",
+                                "ca_domain":obj.smtpSrv ?? "",
+                                "allow_not_secure":!obj.smtpSSLOn,
+                                "remote_srv_name":obj.smtpSrv ?? "",
+                                "remote_srv_port":obj.smtpPort,
+                                "active_stamp_addr":obj.stampAddr ?? ""
                         ]
                 }
                 
-                let imap:JSON = [
+                let smtp:JSON = [
                         "srv_addr":":\(systemConf.smtpPort)",
                         "SrvDomain":"localhost",
+                        "stamp_wallet_addr":curWallet.Addr,
+                        "remote_conf":smtpRemote,
+                        "max_message_bytes":Consts.max_message_bytes,
+                        "read_time_out":Consts.read_time_out,
+                        "write_time_out":Consts.write_time_out,
+                        "max_recipients":Consts.max_recipients
+                ]
+                
+                let imap:JSON = [
+                        "srv_addr":":\(systemConf.imapPort)",
+                        "srv_domain":"localhost",
+                        "remote_conf":imapRemote,
                 ]
                 let conf:JSON = [
                         "log_level":logLev,
-                        "allow_insecure_auth":systemConf.sslOn,
+                        "allow_insecure_auth":!systemConf.sslOn,
                         "cmd_srv_addr":Consts.ServiceCmdAddr,
                         "imap_conf":imap,
+                        "smtp_conf":smtp,
                 ]
-                guard let data = try? conf.rawData(), let str = String(data: data, encoding: .utf8) else{
+                
+                guard let str = conf.rawString(options: [.withoutEscapingSlashes, .fragmentsAllowed]) else{
                         showTipsView = false
                         curSrvIsOn = false
                         return nil

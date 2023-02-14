@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct WalletManagerView: View {
         @Binding var isPresented: Bool
@@ -16,6 +17,8 @@ struct WalletManagerView: View {
         @State var alertMsg = ""
         @State var addrToRemove = ""
         @State var wallets:[Wallet] = []
+        @State private var showingExporter = false
+        @State var walletFile:TextFile?
         
         @Environment(\.presentationMode) var presentationMode
         
@@ -53,10 +56,25 @@ struct WalletManagerView: View {
                                                 })
                                                 Spacer()
                                                 Button(action: {
-                                                        exportWallet()
+                                                        exportWallet(wallet.jsonStr, name:wallet.Name)
                                                 }, label: {
                                                         Label("Export", systemImage: "book")
                                                 })
+                                                .fileExporter(isPresented: $showingExporter,
+                                                              document: walletFile,
+                                                              contentType: .json,
+                                                              defaultFilename: walletFile?.name ?? "wallet") { result in
+                                                        showingAlert = true
+                                                        switch result {
+                                                        case .success(let url):
+                                                                alertMsg = "Save Success"
+                                                                print(url)
+                                                        case .failure(let error):
+                                                                alertMsg = error.localizedDescription
+                                                        }
+                                                } .alert(alertMsg, isPresented: $showingAlert) {
+                                                        Button("OK", role: .cancel) { }
+                                                }
                                                 Spacer()
                                         }
                                 }
@@ -127,14 +145,47 @@ struct WalletManagerView: View {
                 showingAlert = true
         }
         
-        private func exportWallet(){
+        private func exportWallet(_ jsonStr:String?, name:String){
+                guard let str = jsonStr else{
+                        return
+                }
                 
+                walletFile = TextFile(initialText: str)
+                walletFile?.name = name
+                showingExporter = true
         }
         func walletListChanged(_ notification: Notification) {
                 refreshWallets()
         }
 }
 
+struct TextFile: FileDocument {
+        
+        // tell the system we support only plain text
+        static var readableContentTypes = [UTType.json]
+        
+        // by default our document is empty
+        var text = ""
+        public var name = ""
+        
+        // a simple initializer that creates new, empty documents
+        init(initialText: String = "") {
+                text = initialText
+        }
+        
+        // this initializer loads data that has been saved previously
+        init(configuration: ReadConfiguration) throws {
+                if let data = configuration.file.regularFileContents {
+                        text = String(decoding: data, as: UTF8.self)
+                }
+        }
+        
+        // this will be called when the system wants to write our data to disk
+        func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+                let data = Data(text.utf8)
+                return FileWrapper(regularFileWithContents: data)
+        }
+}
 struct WalletManagerView_Previews: PreviewProvider {
         static private var isPresent = Binding<Bool> (
                 get: { true}, set: { _ in }

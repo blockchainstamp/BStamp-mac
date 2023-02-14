@@ -191,7 +191,7 @@ func taskSleep(seconds:Int)async{
 
 public func toValidPort(portStr:String, defaultVal:Int32)->Int32{
         let newVal = Int32(portStr) ?? defaultVal
-        if newVal > 65535 || newVal < 100{
+        if newVal > 65535 || newVal < 1{
                 return defaultVal
         }
         

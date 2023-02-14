@@ -211,7 +211,32 @@ extension SdkDelegate{
         public func initService(confJson:String, auth:String) -> Error?{
                 guard LibStamp.InitService(confJson.GoStr(), auth.GoStr()) == 1 else{
                         guard let e = SdkDelegate.currErr else{
-                                return NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "start service failed"])
+                                return NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "init service failed"])
+                        }
+                        return e
+                }
+                
+                return nil
+        }
+        public func libWriteCaFile(name:String, data:String)throws->String{
+                guard let data = LibStamp.WriteCaFile(name.GoStr(), data.GoStr()) else{
+                        guard let e = SdkDelegate.currErr else{
+                                throw NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "start service failed"])
+                        }
+                        throw e
+                }
+                return String(cString: data)
+        }
+        
+        public func stopService(){
+                LibStamp.StopService()
+        }
+        
+        public func startService() ->Error? {
+                
+                guard LibStamp.StartService() == 1 else{
+                        guard let e = SdkDelegate.currErr else{
+                                return NSError(domain: "", code: 110, userInfo: [NSLocalizedDescriptionKey: "start service failed"])
                         }
                         return e
                 }

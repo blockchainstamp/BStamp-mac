@@ -76,15 +76,12 @@ class Setting:Hashable{
         
         static func createCaFile(fileName:String, caData:Data)->String?{
                 do{
-                        guard  let dir = SdkDelegate.inst.libBaseDir else{
+                        guard let data = String(data: caData, encoding: .utf8) else{
                                 return nil
                         }
-                        var fileUrl = dir
-                        fileUrl.appendPathComponent(fileName, isDirectory: false)
-                        fileUrl = fileUrl.appendingPathExtension(Consts.CAFileExtension)
-                        print("------>>> ca file path:",fileUrl.absoluteString)
-                        try caData.write(to: fileUrl)
-                       return fileUrl.absoluteString
+                        let cleanedPath = try SdkDelegate.inst.libWriteCaFile(name: fileName, data: data)
+                        print("------>>> ca file path:",cleanedPath)
+                       return cleanedPath
                 }catch let err{
                         print("------>>> ca file write err:", err.localizedDescription)
                         return nil

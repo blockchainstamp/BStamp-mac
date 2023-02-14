@@ -223,7 +223,7 @@ struct ModifyEmailAccountView: View {
                                                 message: Text(msg),
                                                 dismissButton: alertAction
                                         )
-                                } .frame(minWidth: 480,minHeight: 540)
+                                } .frame(minWidth: 600,minHeight: 540)
                                 .onAppear(){
                                         caFileName = $selection.caName.wrappedValue ?? ""
                                         smtpSrvAddr = $selection.smtpSrv.wrappedValue ?? ""
@@ -337,7 +337,7 @@ struct ModifyEmailAccountView: View {
                                 if $selection.smtpSSLOn.wrappedValue || $selection.imapSSLOn.wrappedValue{
                                         msg = "reading CA file"
                                         if let url  = caFileUrl, let data =  try? Data(contentsOf: url){
-                                                if let filePath = Setting.createCaFile(fileName: selection.mailAcc!,
+                                                if let filePath = Setting.createCaFile(fileName: selection.smtpSrv!,
                                                                                        caData: data){
                                                         caFileState = .success
                                                         caData = data
