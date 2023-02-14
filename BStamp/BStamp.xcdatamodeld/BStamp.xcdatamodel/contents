@@ -2,6 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21513" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CoreData_Setting" representedClassName="CoreData_Setting" syncable="YES" codeGenerationType="class">
         <attribute name="caData" optional="YES" attributeType="Binary"/>
+        <attribute name="caFilePath" optional="YES" attributeType="String"/>
         <attribute name="caName" optional="YES" attributeType="String"/>
         <attribute name="imapSrv" optional="YES" attributeType="String"/>
         <attribute name="imapSSLOn" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>

@@ -47,7 +47,7 @@ class Setting:Hashable{
                 self.caName = caName
         }
         
-        func updateSetting(_ newSetting  :inout CoreData_Setting){
+        func updateSetting(_ newSetting  :inout CoreData_Setting) throws{
                 
                 newSetting.smtpSrv = self.smtpSrv
                 newSetting.smtpSSLOn = self.smtpSSLOn
@@ -62,7 +62,17 @@ class Setting:Hashable{
                 newSetting.caData = self.caData
                 newSetting.caName = self.caName
                 
-                print("------>>>update stamp setting success")
+                guard let data = caData , var dir = SdkDelegate.inst.libBaseDir else{
+                        return
+                }
+                var fileUrl = dir
+                fileUrl.appendPathComponent(self.mailAcc, isDirectory: false)
+                fileUrl = fileUrl.appendingPathExtension("cer")
+                print(fileUrl.absoluteString)
+                
+                        try data.write(to: fileUrl)
+                        newSetting.caFilePath = fileUrl.absoluteString
+                
         }
         
         
@@ -83,10 +93,10 @@ class Setting:Hashable{
                         if results.isEmpty {
                                 newSetting = CoreData_Setting(context: ctx)
                                 newSetting!.mailAcc = self.mailAcc
-                                updateSetting(&newSetting!)
+                                try updateSetting(&newSetting!)
                         } else {
                                 newSetting = results.first
-                                updateSetting(&newSetting!)
+                                try updateSetting(&newSetting!)
                         }
                         
                         try ctx.save()

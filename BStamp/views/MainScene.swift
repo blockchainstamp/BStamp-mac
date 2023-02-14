@@ -6,29 +6,54 @@
 //
 
 import SwiftUI
+import SwiftyJSON
 
 struct MainScene: View {
         @State var logText:String = ""
+        @State var showTipsView:Bool = false
+        @State var msg:String = ""
+        @State var curSrvIsOn:Bool = false
         var body: some View {
-                VStack{
-                        HStack{
-                                ControlView()//.frame(width: 320)
+                ZStack{
+                        VStack{
+                                HStack{
+                                        ControlView(showTipsView: $showTipsView,
+                                                    msg: $msg,curSrvIsOn:$curSrvIsOn)//.frame(width: 320)
+                                        Spacer()
+                                        AccountListView(curSrvIsOn: $curSrvIsOn)
+                                        Spacer()
+                                }.padding().frame(maxHeight: 320)
+                                TextArea(text: $logText) .border(Color.purple).padding().disabled(true)
                                 Spacer()
-                                AccountListView()
-                                Spacer()
-                        }.padding().frame(maxHeight: 320)
-                        TextArea(text: $logText) .border(Color.purple).padding().disabled(true)
-                        Spacer()
-                }.padding()
+                        }.padding()
+                        CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
+                }.onAppear(){
+                        SdkDelegate.inst.logger = self.logOutPut
+                }.onDisappear(){
+                        SdkDelegate.inst.logger = nil
+                }
+        }
+        
+        func logOutPut(_ msg:String){
+                logText = logText + msg
         }
 }
+
 struct ControlView: View {
+        @Environment(\.managedObjectContext) private var viewContext
+        @FetchRequest(
+                sortDescriptors: [NSSortDescriptor(keyPath: \CoreData_Setting.mailAcc, ascending: true)],
+                animation: .default)
+        private var settings: FetchedResults<CoreData_Setting>
         @EnvironmentObject var curWallet: Wallet
         @EnvironmentObject var systemConf: CoreData_SysConf
-        @State var curSrvIsOn:Bool = false
-        @Environment(\.managedObjectContext) private var viewContext
-        init(){
-        }
+        
+        @Binding var showTipsView:Bool
+        @Binding var msg:String
+        @Binding var curSrvIsOn:Bool
+        @State var logLevels:[String] = ["trace","debug","info","warn","error","fatal","panic"]
+        @State var logLev:String = "info"
+        @State var showAlert:Bool = false
         
         var body: some View {
                 VStack{
@@ -43,29 +68,40 @@ struct ControlView: View {
                                 Text(curWallet.EthAddr ?? "").textSelection(.enabled).font(.subheadline)
                                 Spacer()
                         }
-                        
-                        HStack{
-                                Label("SMTP Port", systemImage: "envelope.arrow.triangle.branch")
-                                TextField("SMTP Port", text: Binding(
-                                        get: { String(systemConf.smtpPort) },
-                                        set: { systemConf.smtpPort = Int16($0) ?? 443}
-                                )).frame(maxWidth: 60)
-                                Spacer()
-                        }
-                        HStack{
-                                Label("IMAP Port", systemImage: "envelope.badge")
-                                TextField("IMAP Port", text: Binding(
-                                        get: { String(systemConf.imapPort) },
-                                        set: { systemConf.imapPort = Int16($0) ?? 996}
-                                )).frame(maxWidth: 60)
-                                Spacer()
-                        }
-                        HStack{
-                                Toggle(isOn:$systemConf.sslOn) {
-                                        Text("SSL ON")
+                        Group{
+                                HStack{
+                                        Label("Log Level:", systemImage:"note.text")
+                                        Picker("", selection: $logLev) {
+                                                ForEach(logLevels, id: \.self){ leve in
+                                                        Text(leve)
+                                                }
+                                        }.frame(maxWidth: 80)
+                                        Spacer()
                                 }
-                                Spacer()
-                        }
+                                HStack{
+                                        Label("SMTP Port", systemImage: "envelope.arrow.triangle.branch")
+                                        TextField("SMTP Port", text: Binding(
+                                                get: { String(systemConf.smtpPort) },
+                                                set: { systemConf.smtpPort = Int16($0) ?? 443}
+                                        )).frame(maxWidth: 60)
+                                        Spacer()
+                                }
+                                HStack{
+                                        Label("IMAP Port", systemImage: "envelope.badge")
+                                        TextField("IMAP Port", text: Binding(
+                                                get: { String(systemConf.imapPort) },
+                                                set: { systemConf.imapPort = Int16($0) ?? 996}
+                                        )).frame(maxWidth: 60)
+                                        Spacer()
+                                }
+                                HStack{
+                                        Toggle(isOn:$systemConf.sslOn) {
+                                                Text("SSL ON")
+                                        }
+                                        Spacer()
+                                }
+                        }.disabled(curSrvIsOn)
+                        
                         Spacer()
                         Button(action: {
                                 startOrStopService()
@@ -89,23 +125,87 @@ struct ControlView: View {
                 }.padding() .overlay(
                         RoundedRectangle(cornerRadius: 16)
                                 .stroke(.green, lineWidth: 2)
-                )
+                ).onAppear(){
+                        NotificationCenter.default.addObserver(forName: Consts.Noti_Service_Status_Changed,
+                                                               object: nil,
+                                                               queue: nil,
+                                                               using: self.statusChanged)
+                }.alert(isPresented: $showAlert) {
+                        Alert(
+                                title: Text("Tips"),
+                                message: Text(msg),
+                                dismissButton: .default(Text("OK"))
+                        )
+                }
         }
         
         private func startOrStopService(){
+                curSrvIsOn = true
+                showTipsView = true
+                Task{
+                        
+                        msg = "preparing config..."
+                        guard let str = prepareConf() else{
+                                showTipsView = false
+                                curSrvIsOn = false
+                                showAlert = true
+                                msg = "config prepare failed"
+                                return
+                        }
+                        
+                        print("------>>> conf json:", str )
+                        if  let e =  SdkDelegate.inst.initService(confJson:str,auth:""){
+                                showTipsView = false
+                                curSrvIsOn = false
+                                showAlert = true
+                                msg = e.localizedDescription
+                                return
+                        }
+                }
+        }
+        
+        private func prepareConf()->String?{
                 
+                var smtpRemote:JSON = [:]
+                var imapRemote:JSON = [:]
+                for obj in settings {
+                        smtpRemote[obj.mailAcc!] = ["ca_files":""]
+                        imapRemote[obj.mailAcc!] = ["":""]
+                }
+                
+                let imap:JSON = [
+                        "srv_addr":":\(systemConf.smtpPort)",
+                        "SrvDomain":"localhost",
+                ]
+                let conf:JSON = [
+                        "log_level":logLev,
+                        "allow_insecure_auth":systemConf.sslOn,
+                        "cmd_srv_addr":Consts.ServiceCmdAddr,
+                        "imap_conf":imap,
+                ]
+                guard let data = try? conf.rawData(), let str = String(data: data, encoding: .utf8) else{
+                        showTipsView = false
+                        curSrvIsOn = false
+                        return nil
+                }
+                
+                return str
+        }
+        
+        func statusChanged(_ notification: Notification) {
+                curSrvIsOn = SdkDelegate.inst.serviceStatus()
         }
 }
 
 
 struct AccountListView: View {
         @Environment(\.managedObjectContext) private var viewContext
-        
         @FetchRequest(
                 sortDescriptors: [NSSortDescriptor(keyPath: \CoreData_Setting.mailAcc, ascending: true)],
                 animation: .default)
         private var settings: FetchedResults<CoreData_Setting>
         
+        @Binding var curSrvIsOn:Bool
         @State var showNewItemView: Bool = false
         @State var showModifyItemView:[String:Bool] = [:]
         @State var showDelAlert = false
@@ -166,7 +266,7 @@ struct AccountListView: View {
                 }.padding().overlay(
                         RoundedRectangle(cornerRadius: 16)
                                 .stroke(.orange, lineWidth: 2)
-                )
+                ).disabled(curSrvIsOn)
         }
         
         private func deleteItem(_ obj:CoreData_Setting){

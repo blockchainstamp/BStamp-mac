@@ -12,8 +12,10 @@ import SwiftUI
 
 enum CmdType:Int8{
         case nop = 0
+        case srvStatusChanged
+        case logOut
 }
-
+typealias LogOutPut = (String)->Void
 class SdkDelegate{
         public static let inst = SdkDelegate()
         public static var currErr:Error?
@@ -21,18 +23,18 @@ class SdkDelegate{
         let workQueue = DispatchQueue(label: "stamp sdk delegate",qos: .background)
         public  var Wallets:[Wallet]=[]
         public var lastWalletAddr:String = ""
-
-        private init(){
-                
-        }
+        public var logger:LogOutPut?
+        public var  libBaseDir:URL?
+        private init(){}
         
         public func InitLib() -> Error?{
                 let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
                 let basDir = paths[0].absoluteString
                 print("------>>>base dir:", basDir)
-                let success = LibStamp.InitLib(basDir.GoStr(), systemCallBack, uiLog) == 1
+                let success = LibStamp.InitLib(basDir.GoStr(), systemCallBack, errSet) == 1
                 if success {
                         print("------>>> stamp lib init success.")
+                        libBaseDir = paths[0]
                         return nil
                 }
                 
@@ -50,16 +52,15 @@ class SdkDelegate{
                 return callback(withJson: String(cString: data)).CStr()
         }
         
-        var uiLog:SetLastErr = {v in
+        var errSet:SetLastErr = {v in
                 guard let data = v else{
                         currErr = nil
                         return
                 }
                 let msg = String(cString: data)
-                NSLog(msg)
+                print("------>>>error from lib:", msg)
                 currErr = NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: msg])
         }
-        
         
         
         static func callback(withJson:String)->String{
@@ -69,6 +70,19 @@ class SdkDelegate{
                 
                 switch cmd{
                 case CmdType.nop.rawValue:
+                        return ""
+                case CmdType.srvStatusChanged.rawValue:
+                        NotificationCenter.default.post(name: Consts.Noti_Service_Status_Changed, object: nil)
+                        return ""
+                case CmdType.logOut.rawValue:
+                        guard let msg = json["param"].string else{
+                                return ""
+                        }
+                        print("------>>>log from lib:", msg)
+                        guard let outter = inst.logger else{
+                                return ""
+                        }
+                        outter(msg)
                         return ""
                 default:
                         return ""
@@ -186,5 +200,22 @@ extension SdkDelegate{
         
         public func isValidEtherAddr(sAddr:String) ->Bool{
                 return LibStamp.IsValidStampAddr(sAddr.GoStr()) == 1
+        }
+}
+extension SdkDelegate{
+        
+        public func serviceStatus()->Bool{
+                return LibStamp.ServiceStatus() == 1
+        }
+        
+        public func initService(confJson:String, auth:String) -> Error?{
+                guard LibStamp.InitService(confJson.GoStr(), auth.GoStr()) == 1 else{
+                        guard let e = SdkDelegate.currErr else{
+                                return NSError(domain: "", code: 110, userInfo: [ NSLocalizedDescriptionKey: "start service failed"])
+                        }
+                        return e
+                }
+                
+                return nil
         }
 }
