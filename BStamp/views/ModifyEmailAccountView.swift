@@ -60,6 +60,17 @@ struct ModifyEmailAccountView: View {
                                                         print("------>>>",smtpChanged)
                                                 }.border(.green)
                                         
+                                        TextField("SMTP Port", text: Binding(get: {
+                                                return "\(selection.smtpPort)"
+                                        }, set: { newVal in
+                                                smtpChanged = true
+                                                selection.smtpPort = toValidPort(portStr: newVal,
+                                                                       defaultVal: Consts.DefaultSmtpPort)
+                                        }))
+                                        .padding()
+                                        .cornerRadius(1.0)
+                                        .border(.green).frame(maxWidth: 80)
+                                        
                                         CheckingView(state: $smtpSrvState)
                                 }.labelStyle(.iconOnly)
                                 
@@ -74,6 +85,17 @@ struct ModifyEmailAccountView: View {
                                                 }.onChange(of: imapSrvAddr) { newValue in
                                                         imapChanged = newValue != $selection.imapSrv.wrappedValue
                                                 }.border(.green)
+                                        
+                                        TextField("IMAP Port", text: Binding(get: {
+                                                return "\(selection.imapPort)"
+                                        }, set: { newVal in
+                                                selection.imapPort = toValidPort(portStr: newVal,
+                                                                      defaultVal: Consts.DefaultImapPort)
+                                                imapChanged = true
+                                        }))
+                                        .padding()
+                                        .cornerRadius(1.0)
+                                        .border(.green).frame(maxWidth: 80)
                                         CheckingView(state: $imapSrvState)
                                         
                                 }.labelStyle(.iconOnly)
@@ -201,7 +223,7 @@ struct ModifyEmailAccountView: View {
                                                 message: Text(msg),
                                                 dismissButton: alertAction
                                         )
-                                } .frame(minWidth: 480,minHeight: 600)
+                                } .frame(minWidth: 480,minHeight: 540)
                                 .onAppear(){
                                         caFileName = $selection.caName.wrappedValue ?? ""
                                         smtpSrvAddr = $selection.smtpSrv.wrappedValue ?? ""
@@ -315,8 +337,15 @@ struct ModifyEmailAccountView: View {
                                 if $selection.smtpSSLOn.wrappedValue || $selection.imapSSLOn.wrappedValue{
                                         msg = "reading CA file"
                                         if let url  = caFileUrl, let data =  try? Data(contentsOf: url){
-                                                caFileState = .success
-                                                caData = data
+                                                if let filePath = Setting.createCaFile(fileName: selection.mailAcc!,
+                                                                                       caData: data){
+                                                        caFileState = .success
+                                                        caData = data
+                                                        $selection.caFilePath.wrappedValue = filePath
+                                                }else{
+                                                        caFileState = .failed
+                                                        success = false
+                                                }
                                         }else{
                                                 caFileState = .failed
                                                 success = false

@@ -9,7 +9,9 @@ import Foundation
 
 class Consts{
         public static let ServiceCmdAddr = "127.0.0.1:2100"
-        
+        public static let CAFileExtension = "cer"
+        public static let DefaultSmtpPort = Int32(443)
+        public static let DefaultImapPort = Int32(996)
         
         public static let Noti_Wallet_Created =  Notification.Name.init("noti_wallet_created")
         public static let Noti_New_Setting_Created =  Notification.Name.init("noti_new_setting_created")

@@ -17,6 +17,8 @@ struct NewEmailAccountView:View{
         @State var msg:String = ""
         @State var eMailAddr:String = ""
         @State var smtpSrv:String = ""
+        @State var smtpPort:Int32 = 443
+        @State var imapPort:Int32 = 996
         @State var imapSrv:String = ""
         @State var caFileName:String = ""
         @State var stampAddr:String = ""
@@ -72,6 +74,17 @@ struct NewEmailAccountView:View{
                                                         focusedField="imap"
                                                 }.border(.green)
                                         
+                                        
+                                        TextField("SMTP Port", text: Binding(get: {
+                                                return "\(smtpPort)"
+                                        }, set: { newVal in
+                                                smtpPort = toValidPort(portStr: newVal,
+                                                                       defaultVal: Consts.DefaultSmtpPort)
+                                        }))
+                                        .padding()
+                                        .cornerRadius(1.0)
+                                        .border(.green).frame(maxWidth: 80)
+                                        
                                         CheckingView(state: $smtpSrvState)
                                 }.labelStyle(.iconOnly)
                                 
@@ -84,6 +97,17 @@ struct NewEmailAccountView:View{
                                                 .onSubmit {
                                                         focusedField="email"
                                                 }.border(.green)
+                                        
+                                        TextField("IMAP Port", text: Binding(get: {
+                                                return "\(imapPort)"
+                                        }, set: { newVal in
+                                                imapPort = toValidPort(portStr: newVal,
+                                                                       defaultVal: Consts.DefaultImapPort)
+                                        }))
+                                        .padding()
+                                        .cornerRadius(1.0)
+                                        .border(.green).frame(maxWidth: 80)
+                                        
                                         CheckingView(state: $imapSrvState)
                                         
                                 }.labelStyle(.iconOnly)
@@ -204,7 +228,7 @@ struct NewEmailAccountView:View{
                                         )
                                 }
                         CircularWaiting(isPresent: $showTipsView, tipsTxt:$msg)
-                }.frame(minWidth: 560,minHeight: 680).onAppear(){
+                }.frame(minWidth: 560,minHeight: 580).onAppear(){
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 focusedField = "email"
                         }
@@ -259,12 +283,15 @@ struct NewEmailAccountView:View{
                 showTipsView = true
                 
                 Task {
+                        let setting = Setting()
+                        
                         var success = true
                         msg = "checking email address"
                         if !eMailAddr.isValidEmail{
                                 emailAddrState = .failed
                                 success = false
                         }else{
+                                setting.mailAcc = eMailAddr
                                 emailAddrState = .success
                         }
                         if Setting.hasObj(addr: eMailAddr){
@@ -276,7 +303,9 @@ struct NewEmailAccountView:View{
                         await taskSleep(seconds: 1)
                         
                         msg = "checking smtp address"
-                        if smtpSrv.isValidHostname || smtpSrv.isValidIpAddress{
+                        if (smtpSrv.isValidHostname || smtpSrv.isValidIpAddress) {
+                                setting.smtpSrv = smtpSrv
+                                setting.smtpPort = smtpPort
                                 smtpSrvState = .success
                         }else{
                                 smtpSrvState = .failed
@@ -286,7 +315,9 @@ struct NewEmailAccountView:View{
                         
                         
                         msg = "checking imap address"
-                        if imapSrv.isValidHostname || imapSrv.isValidIpAddress{
+                        if imapSrv.isValidHostname || imapSrv.isValidIpAddress {
+                                setting.imapSrv = imapSrv
+                                setting.imapPort = imapPort
                                 imapSrvState = .success
                         }else{
                                 imapSrvState = .failed
@@ -295,7 +326,6 @@ struct NewEmailAccountView:View{
                         await taskSleep(seconds: 1)
                         
                         
-                        var stampName:String?
                         if !stampAddr.isEmpty{
                                 if stampObj == nil || stampObj?.Addr != stampAddr{
                                         msg = "checking stamp address"
@@ -305,7 +335,8 @@ struct NewEmailAccountView:View{
                                 if let s = stampObj{
                                         msg = "stamp name is \(s.MailBox) "
                                         stampState = .success
-                                        stampName = s.MailBox
+                                        setting.stampAddr = stampAddr
+                                        setting.stampName = s.MailBox
                                 }else{
                                         stampState = .failed
                                         success = false
@@ -314,12 +345,11 @@ struct NewEmailAccountView:View{
                         
                         await taskSleep(seconds: 1)
                         
-                        var caData:Data?
                         if smtpSSLOn || imapSSLOn{
                                 msg = "reading CA file"
                                 if let url  = caFileUrl, let data =  try? Data(contentsOf: url){
                                         caFileState = .success
-                                        caData = data
+                                        setting.caData = data
                                 }else{
                                         caFileState = .failed
                                         success = false
@@ -330,10 +360,13 @@ struct NewEmailAccountView:View{
                                 return
                         }
                         
-                        let setting = Setting(email: eMailAddr, smtp: smtpSrv, imap: imapSrv,
-                                              stampAddr: stampAddr, stampName: stampName, smtpSSL: smtpSSLOn,
-                                              imapSSL: imapSSLOn,  caName: caFileName, caData: caData)
+                        setting.smtpSSLOn = smtpSSLOn
+                        setting.imapSSLOn = imapSSLOn
                         
+                        //                        (email: eMailAddr, smtp: smtpSrv, imap: imapSrv,
+                        //                                              stampAddr: stampAddr, stampName: stampName, smtpSSL: smtpSSLOn,
+                        //                                              imapSSL: imapSSLOn,  caName: caFileName, caData: caData)
+                        //
                         if let e = setting.syncToDatabase(){
                                 showTipsView = false
                                 showAlert = true

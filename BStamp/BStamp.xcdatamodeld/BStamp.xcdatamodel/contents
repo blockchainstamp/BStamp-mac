@@ -4,9 +4,11 @@
         <attribute name="caData" optional="YES" attributeType="Binary"/>
         <attribute name="caFilePath" optional="YES" attributeType="String"/>
         <attribute name="caName" optional="YES" attributeType="String"/>
+        <attribute name="imapPort" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="imapSrv" optional="YES" attributeType="String"/>
         <attribute name="imapSSLOn" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="mailAcc" optional="YES" attributeType="String"/>
+        <attribute name="smtpPort" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="smtpSrv" optional="YES" attributeType="String"/>
         <attribute name="smtpSSLOn" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="stampAddr" optional="YES" attributeType="String"/>

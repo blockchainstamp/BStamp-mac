@@ -169,8 +169,16 @@ struct ControlView: View {
                 var smtpRemote:JSON = [:]
                 var imapRemote:JSON = [:]
                 for obj in settings {
-                        smtpRemote[obj.mailAcc!] = ["ca_files":""]
-                        imapRemote[obj.mailAcc!] = ["":""]
+                        imapRemote[obj.mailAcc!] = [
+                                "ca_files":obj.caFilePath ?? "",
+                                "ca_domain":obj.smtpSrv ?? "",
+                                "allow_not_secure":obj.smtpSSLOn,
+                                "remote_srv_name":obj.smtpSrv ?? "",
+                                "remote_srv_port":systemConf.smtpPort,
+                        ]
+                        smtpRemote[obj.mailAcc!] = [
+                                "srv_addr":"\(systemConf.smtpPort)",
+                        ]
                 }
                 
                 let imap:JSON = [
@@ -255,7 +263,8 @@ struct AccountListView: View {
                                                                 secondaryButton: .destructive(
                                                                         Text("Sure"),
                                                                         action: {
-                                                                                deleteItem(item)
+                                                                                let tempAddr = item.mailAcc!
+                                                                                deleteItem(tempAddr)
                                                                         }
                                                                 )
                                                         )
@@ -269,8 +278,12 @@ struct AccountListView: View {
                 ).disabled(curSrvIsOn)
         }
         
-        private func deleteItem(_ obj:CoreData_Setting){
-                viewContext.delete(obj)
+        private func deleteItem(_ email:String){
+                for obj in settings{
+                        if obj.mailAcc == email{
+                                viewContext.delete(obj)
+                        }
+                }
         }
 }
 struct MainScene_Previews: PreviewProvider {

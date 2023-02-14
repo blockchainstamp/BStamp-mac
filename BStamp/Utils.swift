@@ -188,3 +188,12 @@ extension Binding {
 func taskSleep(seconds:Int)async{
         try? await Task.sleep(nanoseconds: UInt64(seconds) * 1_000_000_000)
 }
+
+public func toValidPort(portStr:String, defaultVal:Int32)->Int32{
+        let newVal = Int32(portStr) ?? defaultVal
+        if newVal > 65535 || newVal < 100{
+                return defaultVal
+        }
+        
+        return newVal
+}

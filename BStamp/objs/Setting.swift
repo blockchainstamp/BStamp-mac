@@ -13,6 +13,8 @@ class Setting:Hashable{
         var mailAcc:String = ""
         var stampAddr:String?
         var smtpSrv:String = ""
+        var smtpPort:Int32 = Consts.DefaultSmtpPort
+        var imapPort:Int32 = Consts.DefaultImapPort
         var imapSrv:String = ""
         var stampName:String?
         var caName:String = ""
@@ -62,19 +64,32 @@ class Setting:Hashable{
                 newSetting.caData = self.caData
                 newSetting.caName = self.caName
                 
-                guard let data = caData , var dir = SdkDelegate.inst.libBaseDir else{
+                newSetting.imapPort = self.imapPort
+                newSetting.smtpPort = self.smtpPort
+                
+                guard let data = caData else{
                         return
                 }
-                var fileUrl = dir
-                fileUrl.appendPathComponent(self.mailAcc, isDirectory: false)
-                fileUrl = fileUrl.appendingPathExtension("cer")
-                print(fileUrl.absoluteString)
                 
-                        try data.write(to: fileUrl)
-                        newSetting.caFilePath = fileUrl.absoluteString
-                
+                newSetting.caFilePath = Setting.createCaFile(fileName: self.mailAcc, caData: data)
         }
         
+        static func createCaFile(fileName:String, caData:Data)->String?{
+                do{
+                        guard  let dir = SdkDelegate.inst.libBaseDir else{
+                                return nil
+                        }
+                        var fileUrl = dir
+                        fileUrl.appendPathComponent(fileName, isDirectory: false)
+                        fileUrl = fileUrl.appendingPathExtension(Consts.CAFileExtension)
+                        print("------>>> ca file path:",fileUrl.absoluteString)
+                        try caData.write(to: fileUrl)
+                       return fileUrl.absoluteString
+                }catch let err{
+                        print("------>>> ca file write err:", err.localizedDescription)
+                        return nil
+                }
+        }
         
         
         func syncToDatabase() -> Error?{
