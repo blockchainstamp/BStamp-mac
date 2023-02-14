@@ -21,12 +21,7 @@ class SdkDelegate{
         let workQueue = DispatchQueue(label: "stamp sdk delegate",qos: .background)
         public  var Wallets:[Wallet]=[]
         public var lastWalletAddr:String = ""
-        
-#if DEBUG
-        public  var logLevel:String = "debug"
-#else
-        public  var logLevel:String = 0
-#endif
+
         private init(){
                 
         }
@@ -35,7 +30,7 @@ class SdkDelegate{
                 let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
                 let basDir = paths[0].absoluteString
                 print("------>>>base dir:", basDir)
-                let success = LibStamp.InitLib(basDir.GoStr(), logLevel.GoStr(), systemCallBack, uiLog) == 1
+                let success = LibStamp.InitLib(basDir.GoStr(), systemCallBack, uiLog) == 1
                 if success {
                         print("------>>> stamp lib init success.")
                         return nil

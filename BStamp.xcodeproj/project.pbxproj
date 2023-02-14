@@ -167,6 +167,7 @@
 				6998BD4929878B3000C419C2 /* BStamp.xcdatamodeld */,
 				6998BD4429878B3000C419C2 /* Preview Content */,
 				69ED179D298A80B900FB7998 /* SdkDelegate.swift */,
+				2B77E7C2298E0C760011CB0D /* consts.swift */,
 				694F67EE298CE24900868874 /* Utils.swift */,
 			);
 			path = BStamp;
@@ -176,7 +177,6 @@
 			isa = PBXGroup;
 			children = (
 				6998BD4529878B3000C419C2 /* Preview Assets.xcassets */,
-				2B77E7C2298E0C760011CB0D /* consts.swift */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
