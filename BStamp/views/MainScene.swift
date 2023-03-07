@@ -206,14 +206,17 @@ struct ControlView: View {
                 var smtpRemote:JSON = [:]
                 var imapRemote:JSON = [:]
                 for obj in settings {
-                        imapRemote[obj.mailAcc!] = [
+                        
+                        let domain = obj.mailAcc!.components(separatedBy: "@")[1]
+                        
+                        imapRemote[domain] = [
                                 "ca_files":obj.caFilePath ?? "",
                                 "ca_domain":obj.imapSrv ?? "",
                                 "allow_not_secure":!obj.imapSSLOn,
                                 "remote_srv_name":obj.imapSrv ?? "",
                                 "remote_srv_port":obj.imapPort,
                         ]
-                        smtpRemote[obj.mailAcc!] = [
+                        smtpRemote[domain] = [
                                 "ca_files":obj.caFilePath ?? "",
                                 "ca_domain":obj.smtpSrv ?? "",
                                 "allow_not_secure":!obj.smtpSSLOn,
